@@ -78,12 +78,20 @@ class _WelcomeScreenState extends State<Session> {
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
-    final firstCamera = cameras.first;
-    _controller = CameraController(firstCamera, ResolutionPreset.medium);
+    // final firstCamera = cameras.first;
+    // _controller = CameraController(firstCamera, ResolutionPreset.medium);
+    // _initializeControllerFuture = _controller.initialize();
+    // await _initializeControllerFuture;
+ final frontCamera = cameras.firstWhere(
+      (camera) => camera.lensDirection == CameraLensDirection.front,
+      orElse: () => cameras.first,
+    );
+
+    _controller = CameraController(frontCamera, ResolutionPreset.medium);
     _initializeControllerFuture = _controller.initialize();
     await _initializeControllerFuture;
 
-    try { Future.delayed(Duration(seconds: 10));
+    try { Future.delayed(Duration(seconds: 3));
       final image = await _controller.takePicture();
       _capturedImagePath = image.path;
     } catch (e) {
