@@ -27,5 +27,5 @@ void main() async {
   // FlutterError.presentError(details);
   //  };
 
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: Session()));
+  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
 }
