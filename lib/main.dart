@@ -13,9 +13,10 @@ import 'package:mcqs/McqsWithResponse.dart';
 import 'package:mcqs/PatientHome.dart';
 import 'package:mcqs/PatientSideSchedule.dart';
 import 'package:mcqs/Session.dart';
-import 'package:mcqs/SessionWithResponse.dart';
+
 import 'package:mcqs/Signup.dart';
 import 'package:mcqs/Splash.dart';
+import 'package:mcqs/UploadVideo.dart';
 import 'package:mcqs/VideoCall.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -27,5 +28,5 @@ void main() async {
   // FlutterError.presentError(details);
   //  };
 
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
+  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: Upload()));
 }

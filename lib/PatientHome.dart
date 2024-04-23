@@ -550,7 +550,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:mcqs/Session.dart';
-import 'package:mcqs/SessionWithResponse.dart';
+import 'package:mcqs/UploadVideo.dart';
+
 import 'package:mcqs/VideoCall.dart';
 
 void main() {
@@ -569,7 +570,7 @@ class PatientHome extends StatelessWidget {
       ),
       routes: {
        '/session': (context) => Session(),
-       '/videocall':(context) => VideoCall(), // Define route for Session Screen
+       '/videocall':(context) => Upload(), // Define route for Session Screen
       },
     );
   }
