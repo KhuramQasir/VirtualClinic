@@ -24,35 +24,32 @@ class _WelcomeScreenState extends State<Session> {
     questionData = fetchQuestionData();
   }
 
-  Future<void> postData() async {
+  Future<void> postData({
+    required int selectionDetailsId,
+    required String selectionOption,
+    required int patientHistoryId,
+    required File patientResponseImage,
+    required String stimuliImg,
+  }) async {
     try {
-      // API endpoint
-      var url = Uri.parse('$apiUrl/add_patient_session_response');
+      var request = http.MultipartRequest('POST', Uri.parse('$apiUrl/add_patient_session_response'));
 
-      // Create a multipart request
-      var request = http.MultipartRequest('POST', url);
+      // Add fields to the request
+      request.fields['selected_option'] = selectionOption;
+      request.fields['session_details_id'] = selectionDetailsId.toString();
+      request.fields['patient_history_id'] = patientHistoryId.toString();
+      request.fields['stimuli_img'] = stimuliImg;
 
-      // Add form fields
-      request.fields['selected_option'] = selectedOption!;
-      request.fields['session_details_id'] = '1';
-      request.fields['patient_history_id'] = '1';
+      // Add image file to the request
+      request.files.add(await http.MultipartFile.fromPath('patient_response_image', patientResponseImage.path));
 
-      // Add image file
-      var file = await http.MultipartFile.fromPath(
-          'patient_response_image', _capturedImagePath!);
-      request.files.add(file);
-
-      // Send the request
       var streamedResponse = await request.send();
-
-      // Get the response
       var response = await http.Response.fromStream(streamedResponse);
 
-      // Handle the response
       if (response.statusCode == 200) {
-        print('Response: ${response.body}');
+        print('Data posted successfully');
       } else {
-        print('Request failed with status: ${response.statusCode}');
+        print('Failed to post data. Error: ${response.reasonPhrase}');
       }
     } catch (e) {
       print('Error: $e');
@@ -78,11 +75,7 @@ class _WelcomeScreenState extends State<Session> {
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
-    // final firstCamera = cameras.first;
-    // _controller = CameraController(firstCamera, ResolutionPreset.medium);
-    // _initializeControllerFuture = _controller.initialize();
-    // await _initializeControllerFuture;
- final frontCamera = cameras.firstWhere(
+    final frontCamera = cameras.firstWhere(
       (camera) => camera.lensDirection == CameraLensDirection.front,
       orElse: () => cameras.first,
     );
@@ -91,7 +84,8 @@ class _WelcomeScreenState extends State<Session> {
     _initializeControllerFuture = _controller.initialize();
     await _initializeControllerFuture;
 
-    try { Future.delayed(Duration(seconds: 3));
+    try {
+      Future.delayed(Duration(seconds: 3));
       final image = await _controller.takePicture();
       _capturedImagePath = image.path;
     } catch (e) {
@@ -215,8 +209,8 @@ class _WelcomeScreenState extends State<Session> {
                   ...List.generate(
                     snapshot.data[currentIndex].options.length,
                     (index) => RadioListTile<String>(
-                      title: Text( snapshot.data[currentIndex].options[index]),
-                      value:  snapshot.data[currentIndex].options[index],
+                      title: Text(snapshot.data[currentIndex].options[index]),
+                      value: snapshot.data[currentIndex].options[index],
                       groupValue: selectedOption,
                       onChanged: (value) {
                         setState(() {
@@ -227,16 +221,19 @@ class _WelcomeScreenState extends State<Session> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                     
                       setState(() {
                         // Move to next question
-                        if (currentIndex <  snapshot.data.length-1) {
-                          // Reset index if it goes beyond the number of questions
-                          // currentIndex = 0;
+                        if (currentIndex < snapshot.data.length - 1) {
                           currentIndex++;
                         }
                         _initializeCamera();
-                        postData();
+                        postData(
+                          patientHistoryId: 1,
+                          patientResponseImage: File(_capturedImagePath!),
+                          selectionDetailsId: 4,
+                          selectionOption: selectedOption!,
+                          stimuliImg: data.imageUrl,
+                        );
                       });
                     },
                     child: Text('Next'),

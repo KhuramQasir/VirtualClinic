@@ -16,6 +16,10 @@ dependencies:
   camera: ^0.10.5+9
   path_provider: ^2.1.2
   path: ^1.8.3
+  image_picker: ^1.0.8
+  video_player: ^2.8.5
+  # multi_image_picker: ^4.8.4
+
 
 dev_dependencies:
   flutter_test:
