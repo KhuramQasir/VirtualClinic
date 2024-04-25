@@ -1,16 +1,18 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:mcqs/Home.dart';
 
-
-
-
-class PatientMonthlySchedule extends StatelessWidget {
-  const PatientMonthlySchedule ({Key? key}) : super(key: key);
+class PatientMonthlySchedule extends StatefulWidget {
+  const PatientMonthlySchedule({Key? key}) : super(key: key);
 
   @override
-  
+  _PatientMonthlyScheduleState createState() =>
+      _PatientMonthlyScheduleState();
+}
+
+class _PatientMonthlyScheduleState extends State<PatientMonthlySchedule> {
+  List<DateTime?> selectedDates = List.filled(5, null);
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -75,26 +77,48 @@ class PatientMonthlySchedule extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Expanded(
-              child: ListView.separated(
-                physics: NeverScrollableScrollPhysics(),
+              child: ListView.builder(
                 itemCount: 5,
-                separatorBuilder: (context, index) => SizedBox(height: 16),
-                itemBuilder: (context, index) => Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[100],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    "Sunday Item $index",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[100],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedDates[index] != null
+                                    ? " $index - ${selectedDates[index]!.day}/${selectedDates[index]!.month}/${selectedDates[index]!.year} ${selectedDates[index]!.hour}:${selectedDates[index]!.minute}"
+                                    : " $index",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                _selectDateTime(context, index);
+                              },
+                              child: Text("Select Date & Time"),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                  );
+                },
               ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {navigateToPatientReport;},
+              onPressed: () {
+                navigateToPatientReport(context); // Navigate to another screen
+              },
               child: Text("Accept"),
             ),
           ],
@@ -102,11 +126,45 @@ class PatientMonthlySchedule extends StatelessWidget {
       ),
     );
   }
+
+  // Function to open date picker for a specific index
+  Future<void> _selectDateTime(BuildContext context, int index) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+      if (pickedTime != null) {
+        setState(() {
+          selectedDates[index] = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+        });
+      }
+    }
+  }
+
+  // Function to navigate to another screen
   void navigateToPatientReport(BuildContext context) {
-  Navigator.push(
-    context,
-     MaterialPageRoute(builder: (context) => HomeScreen()),
-  );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
+    );
+  }
 }
 
+void main() {
+  runApp(MaterialApp(
+    home: PatientMonthlySchedule(),
+  ));
 }

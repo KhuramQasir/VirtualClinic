@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mcqs/McqsWithResponse.dart';
+import 'package:mcqs/PatientHome.dart';
 
 class GetStart extends StatelessWidget {
   @override
@@ -60,7 +61,7 @@ class GetStart extends StatelessWidget {
                         // Navigate to the MCQs screen
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => McqsWithResponse()),
+                          MaterialPageRoute(builder: (context) => PatientHome()),
                         );
                       },
                       child: Container(
