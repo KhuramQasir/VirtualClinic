@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mcqs/MCQs.dart';
+
 import 'package:mcqs/McqsWithResponse.dart';
 
 class GetStart extends StatelessWidget {

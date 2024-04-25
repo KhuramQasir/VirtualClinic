@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mcqs/AdminSide/Admindashboard.dart';
+
 import 'package:mcqs/GetStart.dart';
 
 
@@ -59,7 +61,9 @@ class HomeScreen extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 1 * fem, 0 * fem),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {   Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Admindashboard()));},
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
                     ),

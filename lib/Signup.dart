@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mcqs/Home.dart';
-import 'package:mcqs/MCQs.dart'; // Assuming MCQs is the screen after successful signup
+ // Assuming MCQs is the screen after successful signup
 
 class Signup extends StatefulWidget {
   @override
