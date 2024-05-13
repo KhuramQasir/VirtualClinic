@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mcqs/DoctorSide/Appointments.dart';
+import 'package:mcqs/DoctorSide/ApproveApointment.dart';
 import 'package:mcqs/PatientMontlySchedule.dart';
 import 'package:mcqs/PatientReport.dart';
 import 'package:mcqs/Session.dart';
@@ -6,17 +8,15 @@ import 'package:mcqs/UploadVideo.dart';
 
 import 'package:mcqs/VideoCall.dart';
 
-void main() {
-  runApp(PatientHome());
-}
 
-class PatientHome extends StatelessWidget {
+
+class Doctordashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Consultation Screen'),
+          title: Text('Doctor'),
         ),
         body: ConsultationScreen(),
       ),
@@ -35,8 +35,25 @@ class ConsultationScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          SizedBox(height: 20),
           Text(
-            'Consultations',
+            'Appointments',
+            style: TextStyle(fontSize: 24),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Action for Start Video button
+             Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Appointments())
+                              )
+                              ;
+            },
+            child: Text('Check Appoint '),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Approve Patient',
             style: TextStyle(fontSize: 24),
           ),
           ElevatedButton(
@@ -44,12 +61,13 @@ class ConsultationScreen extends StatelessWidget {
               // Navigate to Session Screen when button pressed
              Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => PatientMonthlySchedule())
+                              MaterialPageRoute(builder: (context) => ApproveAppointment())
                               )
                               ;
             },
-            child: Text('View Appointments'),
+            child: Text('Check'),
           ),
+          
           SizedBox(height: 20),
           Text(
             'Session',
@@ -79,7 +97,7 @@ class ConsultationScreen extends StatelessWidget {
           ),
           SizedBox(height: 20),
           Text(
-            'Report',
+            'Patient Record',
             style: TextStyle(fontSize: 24),
           ),
           ElevatedButton(
@@ -91,8 +109,8 @@ class ConsultationScreen extends StatelessWidget {
                               )
                               ;
             },
-            child: Text('Check Report'),
-          ), 
+            child: Text('View'),
+          ),
         ],
       ),
     );

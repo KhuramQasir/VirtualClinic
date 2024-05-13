@@ -82,7 +82,7 @@ class _MCQsState extends State<McqsWithResponse> {
   void handleNextButtonClick() {
     setState(() {
       answers.add({
-        'patient_id': 6, // Replace with actual patient ID
+        'patient_id': patientid, // Replace with actual patient ID
         'selected_option': selectedOption,
         'questionnaire_id': 6, // Replace with actual questionnaire ID
       });

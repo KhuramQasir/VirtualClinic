@@ -7,6 +7,10 @@ import 'package:mcqs/AdminSide/Admindashboard.dart';
 
 import 'package:mcqs/Api.dart';
 import 'package:mcqs/Camera.dart';
+import 'package:mcqs/DoctorSide/Appointments.dart';
+import 'package:mcqs/DoctorSide/ApproveApointment.dart';
+import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
+import 'package:mcqs/DoctorSide/Doctordashboard.dart';
 import 'package:mcqs/GetStart.dart';
 import 'package:mcqs/Home.dart';
 import 'package:mcqs/Lock.dart';

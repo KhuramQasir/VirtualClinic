@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:mcqs/AdminSide/Admindashboard.dart';
+import 'package:mcqs/DoctorSide/Doctordashboard.dart';
 
 import 'package:mcqs/Home.dart';
+import 'package:mcqs/PatientHome.dart';
+import 'package:mcqs/constants.dart';
 import 'signup.dart'; // Import the Signup screen file
 
 class Login extends StatefulWidget {
@@ -13,16 +19,10 @@ class _LoginState extends State<Login> {
   TextEditingController _passwordController = TextEditingController();
 
   void loginButton() {
-    String username = _usernameController.text;
-    String password = _passwordController.text;
-    print(username);
-    print(password);
+  
 
-    // Navigate to MCQs screen
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => HomeScreen()),
-    );
+   
+    loginUser();
   }
 
   void navigateToSignup() {
@@ -32,6 +32,109 @@ class _LoginState extends State<Login> {
       MaterialPageRoute(builder: (context) => Signup()),
     );
   }
+
+ Future<void> loginUser() async {
+    String apiUrl = 'http://192.168.100.22:5000/Userlogin';
+
+    Map<String, String> headers = {"Content-type": "application/json"};
+    Map<String, String> data = {
+      'username': _usernameController.text,
+      'password': _passwordController.text,
+    };
+
+    var response = await http.post(Uri.parse(apiUrl),
+        headers: headers, body: json.encode(data));
+    var responseBody = json.decode(response.body);
+      var message = responseBody[0]['message'];
+      var statusCode = responseBody[1];
+
+    if (statusCode == 200) {
+      var responseBody = json.decode(response.body);
+      var userMessage = responseBody[0]['message'];
+      var userId = responseBody[0]['user_id'];
+
+      // Saving user id and user type
+      // Let's assume the user type is determined by the message
+      String userType;
+      if (userMessage == "Patient login") {
+        userType = "patient";
+        userId=responseBody[0]['user_id'];
+        patientid=userId;
+         Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => PatientHome()),
+    );
+      } else if (userMessage == "Doctor login") {
+        userType = "doctor";
+         Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Doctordashboard()),
+    );
+      } else if (userMessage == "Admin login") {
+        userType = "admin";
+         Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Admindashboard()),
+    );
+      } else {
+        userType = "unknown";
+      }
+
+      // Now you have the userId and userType, you can use/store them as needed
+      print("User ID: $userId");
+      print("User Type: $userType");
+    
+    } else {
+      // Login failed
+      var responseBody = json.decode(response.body);
+      var message = responseBody[0]['message'];
+      var statusCode = responseBody[1];
+
+      if (statusCode == 401) {
+        // Invalid credentials
+        print("Invalid credentials: $message");
+        // Display error message to user
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Login Failed"),
+              content: Text("$message"),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Other errors
+        print("Login failed. Error code: ${response.statusCode}");
+        // Display generic error message to user
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Login Failed"),
+              content: Text("An error occurred while logging in."),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +207,9 @@ class _LoginState extends State<Login> {
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: loginButton,
+                        onPressed: (){
+                          loginUser();
+                        },
                         child: Text('Login'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
@@ -136,5 +241,6 @@ class _LoginState extends State<Login> {
         ),
       ),),
     );
-  }
+  
+}
 }

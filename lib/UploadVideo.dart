@@ -118,7 +118,7 @@ final picker = ImagePicker();
 										),
 										ElevatedButton( 
 											style: ButtonStyle( 
-												backgroundColor: MaterialStateProperty.all(Colors.green)), 
+												backgroundColor: MaterialStateProperty.all(Color(0xff0EBE7F))), 
 											child: const Text('Upload 3'), 
 											onPressed: () { 
                      setState(() {
@@ -243,7 +243,7 @@ void _showPicker({
 				Navigator.of(context).pop(
            postData(
                           PatientHistoryId: 1,
-                          Videofile: File(galleryFile!.path),
+                          Videofile: galleryFile!,
                           Question: 4,
                          
                         ),

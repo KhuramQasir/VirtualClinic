@@ -228,7 +228,7 @@ class _WelcomeScreenState extends State<Session> {
                         }
                         _initializeCamera();
                         postData(
-                          patientHistoryId: 1,
+                          patientHistoryId: patientid,
                           patientResponseImage: File(_capturedImagePath!),
                           selectionDetailsId: 4,
                           selectionOption: selectedOption!,
