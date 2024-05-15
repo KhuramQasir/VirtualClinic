@@ -8,7 +8,7 @@ import 'package:mcqs/Home.dart';
 import 'package:mcqs/PatientHome.dart';
 import 'package:mcqs/constants.dart';
 import 'signup.dart'; // Import the Signup screen file
-
+import 'package:mcqs/constants.dart'; 
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
@@ -34,7 +34,7 @@ class _LoginState extends State<Login> {
   }
 
  Future<void> loginUser() async {
-    String apiUrl = 'http://192.168.100.22:5000/Userlogin';
+    String Url = "$apiUrl/Userlogin";
 
     Map<String, String> headers = {"Content-type": "application/json"};
     Map<String, String> data = {
@@ -42,7 +42,7 @@ class _LoginState extends State<Login> {
       'password': _passwordController.text,
     };
 
-    var response = await http.post(Uri.parse(apiUrl),
+    var response = await http.post(Uri.parse(Url),
         headers: headers, body: json.encode(data));
     var responseBody = json.decode(response.body);
       var message = responseBody[0]['message'];

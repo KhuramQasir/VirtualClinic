@@ -20,7 +20,7 @@ class Admindashboard extends StatelessWidget {
             SizedBox(height: 20),
             _buildAdminOfClinic(),
             SizedBox(height: 20),
-            _buildTotalPatientS(
+            _buildTotalDoctor(
               context,
               totalPatientS: "Total Doctor’s",
               count: "25",
@@ -53,6 +53,7 @@ class Admindashboard extends StatelessWidget {
            
             SizedBox(height: 20),
             _buildButtonReviewRegistrations(context, "Review Registrations"),
+             SizedBox(height: 40), 
           ],
         ),
       ),
@@ -97,62 +98,109 @@ Navigator.push(
     return ListTile(
       title: Text("Admin of Clinic", style: TextStyle(fontSize: 18)),
       leading: CircleAvatar(child: Icon(Icons.person)),
-      trailing: Text("2"),
+      trailing: Text(""),
     );
   }
 
-  Widget _buildTotalPatientS(BuildContext context,
-      {required String totalPatientS, required String count}) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(totalPatientS, style: TextStyle(fontSize: 16)),
-          SizedBox(height: 5),
-          Text(count, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
+  
+Widget _buildTotalPatientS(BuildContext context,
+    {required String totalPatientS, required String count}) {
+  return Container(
+    padding: EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: Colors.blue, // Background color
+      border: Border.all(color: Colors.black),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(totalPatientS, style: TextStyle(fontSize: 16)),
+        SizedBox(height: 5),
+        Text(count, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      ],
+    ),
+  );
+}
 
-  Widget _buildButtonViewDoctors(BuildContext context, String text) {
-    return ElevatedButton(
-      onPressed: () {
-       Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => AdminDoctorInfo())
-                              );
-      },
-      child: Text(text),
-    );
-  }
-   Widget _buildButtonViewPatients(BuildContext context, String text) {
-    return ElevatedButton(
+Widget  _buildTotalDoctor(BuildContext context,
+    {required String totalPatientS, required String count}) {
+  return Container(
+    padding: EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: Color.fromARGB(255, 207, 149, 33), // Background color
+      border: Border.all(color: Colors.black),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(totalPatientS, style: TextStyle(fontSize: 16)),
+        SizedBox(height: 5),
+        Text(count, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      ],
+    ),
+  );
+}
+
+ 
+Widget _buildButtonViewDoctors(BuildContext context, String text) {
+  return SizedBox(
+    width: double.infinity, // Set width to match parent width
+    child: ElevatedButton(
       onPressed: () {
         Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => AdminPatientInfo())
-                              );
+          context,
+          MaterialPageRoute(builder: (context) => AdminDoctorInfo()),
+        );
       },
+      style: ElevatedButton.styleFrom(
+        primary: Colors.green, // Background color
+        onPrimary: Colors.white, // Text color
+      ),
       child: Text(text),
-    );
-  }
-   Widget  _buildButtonReviewRegistrations(BuildContext context, String text) {
-    return ElevatedButton(
+    ),
+  );
+}
+
+Widget _buildButtonViewPatients(BuildContext context, String text) {
+  return SizedBox(
+    width: double.infinity, // Set width to match parent width
+    child: ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AdminPatientInfo()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        primary: Colors.green, // Background color
+        onPrimary: Colors.white, // Text color
+      ),
+      child: Text(text),
+    ),
+  );
+}
+
+Widget _buildButtonReviewRegistrations(BuildContext context, String text) {
+  return SizedBox(
+    width: double.infinity, // Set width to match parent width
+    child: ElevatedButton(
       onPressed: () {
         // Navigator.push(
-        //                       context,
-        //                       MaterialPageRoute(builder: (context) => AdminAproveRegistration())
-        //                       );
+        //   context,
+        //   MaterialPageRoute(builder: (context) => AdminAproveRegistration()),
+        // );
       },
+      style: ElevatedButton.styleFrom(
+        primary: Colors.green, // Background color
+        onPrimary: Colors.white, // Text color
+      ),
       child: Text(text),
-    );
-  }
+    ),
+  );
+}
+
 }
 
 void main() {

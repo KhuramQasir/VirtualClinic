@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:mcqs/Home.dart';
 import 'package:mcqs/Login.dart';
+import 'package:mcqs/constants.dart';
 
 class PatientSignup extends StatefulWidget {
   @override
@@ -43,7 +44,7 @@ class _PatientSignupState extends State<PatientSignup> {
   }
 Future<void> signUpPatient() async {
    try {
-  var url = Uri.parse('http://192.168.100.22:5000/PatientSignUp'); // Replace with your server's IP and port
+  var url = Uri.parse('$apiUrl/PatientSignUp'); // Replace with your server's IP and port
   var headers = {'Content-Type': 'application/json'};
   var body = json.encode({
     "name":  _nameController.text,

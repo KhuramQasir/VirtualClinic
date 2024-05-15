@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mcqs/DoctorSide/Appointments.dart';
 import 'package:mcqs/DoctorSide/ApproveApointment.dart';
+import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
+import 'package:mcqs/DoctorSide/DoctorRating.dart';
 import 'package:mcqs/PatientMontlySchedule.dart';
 import 'package:mcqs/PatientReport.dart';
 import 'package:mcqs/Session.dart';
@@ -81,7 +83,7 @@ class ConsultationScreen extends StatelessWidget {
           ),
           SizedBox(height: 20),
           Text(
-            'Video Call',
+            'Doctor Ranking',
             style: TextStyle(fontSize: 24),
           ),
           ElevatedButton(
@@ -89,15 +91,15 @@ class ConsultationScreen extends StatelessWidget {
               // Action for Start Video button
              Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => Upload())
+                              MaterialPageRoute(builder: (context) => DoctorRanking())
                               )
                               ;
             },
-            child: Text('Start Video'),
+            child: Text('Doctor Ranking'),
           ),
           SizedBox(height: 20),
           Text(
-            'Patient Record',
+            'Prescrition',
             style: TextStyle(fontSize: 24),
           ),
           ElevatedButton(
@@ -105,7 +107,7 @@ class ConsultationScreen extends StatelessWidget {
               // Action for Check Report button
                Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => PatientReport())
+                              MaterialPageRoute(builder: (context) => DoctorPrescrition())
                               )
                               ;
             },
