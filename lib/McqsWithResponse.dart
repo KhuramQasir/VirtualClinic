@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mcqs/GetStart.dart';
 import 'dart:convert';
 
 import 'package:mcqs/PatientHome.dart';
 import 'package:mcqs/constants.dart'; // For apiUrl
 
 class McqsWithResponse extends StatefulWidget {
+  const McqsWithResponse({Key? key}) : super(key: key);
   @override
   _MCQsState createState() => _MCQsState();
 }
@@ -82,15 +84,16 @@ class _MCQsState extends State<McqsWithResponse> {
   void handleNextButtonClick() {
     setState(() {
       answers.add({
-        'patient_id': patientid, // Replace with actual patient ID
+        'patient_id': pid, // Replace with actual patient ID
         'selected_option': selectedOption,
         'questionnaire_id': 6, // Replace with actual questionnaire ID
       });
-
+print(patientid);
       if (currentQuestionIndex < questions.length - 1) {
         currentQuestionIndex++;
         selectedOption = questions[currentQuestionIndex]['options'][0];
       } else {
+        print(answers);
         // Show completion dialog
         sendData(answers);
         showDialog(
@@ -102,7 +105,7 @@ class _MCQsState extends State<McqsWithResponse> {
               TextButton(
                 onPressed: () {
                   // Navigate to PatientHome
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => PatientHome(),
@@ -161,10 +164,4 @@ class _MCQsState extends State<McqsWithResponse> {
             ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: McqsWithResponse(),
-  ));
 }

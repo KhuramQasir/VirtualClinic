@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:mcqs/AdminSide/Admindashboard.dart';
 import 'package:mcqs/DoctorSide/Doctordashboard.dart';
+import 'package:mcqs/GetStart.dart';
 
 import 'package:mcqs/Home.dart';
 import 'package:mcqs/PatientHome.dart';
@@ -15,15 +16,17 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  String _result = '';
+  bool _isDiseaseFound = false;
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
   void loginButton() {
   
-
-   
     loginUser();
   }
+
+ 
 
   void navigateToSignup() {
     // Navigate to Signup screen
@@ -33,7 +36,7 @@ class _LoginState extends State<Login> {
     );
   }
 
- Future<void> loginUser() async {
+  Future<void> loginUser() async {
     String Url = "$apiUrl/Userlogin";
 
     Map<String, String> headers = {"Content-type": "application/json"};
@@ -44,45 +47,43 @@ class _LoginState extends State<Login> {
 
     var response = await http.post(Uri.parse(Url),
         headers: headers, body: json.encode(data));
-    var responseBody = json.decode(response.body);
-      var message = responseBody[0]['message'];
+    var responseBody =await json.decode(response.body);
+      var message =await responseBody[0]['message'];
+      var userId = responseBody[0]['user_id'];
       var statusCode = responseBody[1];
 
     if (statusCode == 200) {
-      var responseBody = json.decode(response.body);
-      var userMessage = responseBody[0]['message'];
-      var userId = responseBody[0]['user_id'];
+     
+      if (message == 'Patient login') {
+       
+        userId=await responseBody[0]['user_id'];
+       patientid=userId;
 
-      // Saving user id and user type
-      // Let's assume the user type is determined by the message
-      String userType;
-      if (userMessage == "Patient login") {
-        userType = "patient";
-        userId=responseBody[0]['user_id'];
-        patientid=userId;
+
+        
          Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => PatientHome()),
+      MaterialPageRoute(builder: (context) => GetStart() ),
     );
-      } else if (userMessage == "Doctor login") {
-        userType = "doctor";
+      } else if (message == "Doctor login") {
+       
          Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => Doctordashboard()),
     );
-      } else if (userMessage == "Admin login") {
-        userType = "admin";
+      } else if (message == "Admin login") {
+       
          Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => Admindashboard()),
     );
       } else {
-        userType = "unknown";
+       
       }
 
       // Now you have the userId and userType, you can use/store them as needed
       print("User ID: $userId");
-      print("User Type: $userType");
+    
     
     } else {
       // Login failed
@@ -135,6 +136,7 @@ class _LoginState extends State<Login> {
       }
     }
 }
+
 
   @override
   Widget build(BuildContext context) {

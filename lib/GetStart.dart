@@ -1,9 +1,14 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:mcqs/McqsWithResponse.dart';
 import 'package:mcqs/PatientHome.dart';
+import 'package:mcqs/constants.dart';
 
 class GetStart extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     // double fem = MediaQuery.of(context).size.width / 500; // Adjust according to your design
@@ -11,21 +16,62 @@ class GetStart extends StatelessWidget {
     double fem = 1; // You should define your fem value appropriately
     double ffem = 1; // You should define your ffem value appropriately
 
+ Future<void> findDisease(String id) async {
+  final url = Uri.parse('$apiUrl/find_disease/$id');
+  
+  try {
+    // Make the HTTP GET request
+    final response = await http.get(url);
+
+    // Check if the response is successful
+  
+      // Decode the JSON response
+      Map<String, dynamic>? jsonMap = jsonDecode(response.body);
+
+      // Check if jsonMap is not null
+      if (jsonMap != null) {
+        // Try to access 'message' and 'patient_id' keys
+        String? message = jsonMap['message'];
+        int? patientId = jsonMap['patient_id'];
+
+        if (message != null && patientId != null) {
+          // Print the message and patient ID
+          print('Message: $message');
+          print('Patient ID: $patientId');
+          pid=patientId;
+          // Evaluate the response and print appropriate message
+          if (message == "Disease find") {
+              Navigator.push(context, MaterialPageRoute(builder: (context){
+                            return PatientHome();
+                          }));
+            print('Disease found for Patient ID: $patientId');
+
+          } else {
+              Navigator.push(context, MaterialPageRoute(builder: (context){
+                            return McqsWithResponse();
+                          }));
+            print('No disease found for Patient ID: $patientId');
+          }
+        } else {
+          print('Error: Response format is incorrect.');
+        }
+      } else {
+        print('Error: Response body is null.');
+      }
+   
+  } catch (e) {
+    // Handle the exception here if needed
+    print('Error occurred: $e');
+  }
+}
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Container(
-              //   margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0.33 * fem, 0 * fem),
-              //   width: 143.67 * fem,
-              //   height: 44.27 * fem,
-              //   // child: Image.network(
-              //   //   '[Image url]',
-              //   //   fit: BoxFit.cover,
-              //   // ),
-              // ),
+        
               Container(
                 margin: EdgeInsets.fromLTRB(7 * fem, 77 * fem, 0 * fem, 0 * fem),
                 child: Text(
@@ -57,12 +103,24 @@ class GetStart extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        // Navigate to the MCQs screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => PatientHome()),
-                        );
+                      onTap: () async{
+                     
+                     
+                        var res=await findDisease(patientid.toString());
+                
+                      // if(res==true){
+                      //     Navigator.push(context, MaterialPageRoute(builder: (context){
+                      //       return PatientHome();
+                      //     }));
+                      // }else if(res==false){
+                      //    Navigator.push(context, MaterialPageRoute(builder: (context){
+                      //       return McqsWithResponse();
+                      //     }));
+                      // }
+
+
+
+                       
                       },
                       child: Container(
                         width: 190,
