@@ -18,12 +18,67 @@ class _MCQsState extends State<McqsWithResponse> {
   int currentQuestionIndex = 0;
   String? selectedOption;
   List<Map<String, dynamic>> answers = [];
+   List<String> patientdiseaseoption = [];
 
   @override
   void initState() {
     super.initState();
     fetchQuestions();
   }
+
+
+
+
+static callPatientDiseaseAPI(BuildContext context, int patientId, List<String> patientResponses) async {
+  try {
+    // Your Flask API endpoint URL
+    String Url = '$apiUrl/patient_disease';
+
+    // Prepare the request body
+    Map<String, dynamic> requestBody = {
+      'patient_id': patientId,
+      'patient_responses': patientResponses,
+    };
+
+    // Make the POST request
+    var response = await http.post(
+      Uri.parse(Url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    var responseBody = await json.decode(response.body);
+    var message = responseBody['message'];
+
+    // Check if request is successful
+    if (message != null) {
+      // Display a SnackBar with the message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    } else {
+      // If request failed, return error message
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+     
+    }
+  } catch (e) {
+    // If an exception occurs, return error message
+     ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Exception occurred: $e'),
+        ),
+      );
+  }
+}
+
 
   Future<void> sendData(List<Map<String, dynamic>> dataArray) async {
     try {
@@ -83,16 +138,24 @@ class _MCQsState extends State<McqsWithResponse> {
 
   void handleNextButtonClick() {
     setState(() {
+      
       answers.add({
         'patient_id': pid, // Replace with actual patient ID
         'selected_option': selectedOption,
         'questionnaire_id': 6, // Replace with actual questionnaire ID
-      });
+      }  );
+    if (selectedOption != null) {
+  patientdiseaseoption.add(selectedOption!); // Adding selectedOption to the list if it's not null
+}
+
+
 print(patientid);
       if (currentQuestionIndex < questions.length - 1) {
         currentQuestionIndex++;
         selectedOption = questions[currentQuestionIndex]['options'][0];
       } else {
+        callPatientDiseaseAPI(context,pid,patientdiseaseoption);
+        print(patientdiseaseoption);
         print(answers);
         // Show completion dialog
         sendData(answers);

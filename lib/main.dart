@@ -2,13 +2,15 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:mcqs/AdminSide/AdminDoctortableInfo.dart';
+import 'package:mcqs/AdminSide/AdminAproveRegistration.dart';
+import 'package:mcqs/AdminSide/AdminDetailScreen.dart';
 import 'package:mcqs/AdminSide/Admindashboard.dart';
+import 'package:mcqs/AdminSide/AllDoctor.dart';
+import 'package:mcqs/AdminSide/AllPatients.dart';
+import 'package:mcqs/AdminSide/DoctorInfo.dart';
 
 import 'package:mcqs/Api.dart';
 import 'package:mcqs/Camera.dart';
-import 'package:mcqs/DoctorSide/Appointments.dart';
-import 'package:mcqs/DoctorSide/ApproveApointment.dart';
 import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
 import 'package:mcqs/DoctorSide/Doctordashboard.dart';
 import 'package:mcqs/GetStart.dart';
@@ -36,5 +38,5 @@ void main() async {
   // FlutterError.presentError(details);
   //  };
 
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: Splash()));
+  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: Admindashboard()));
 }

@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:mcqs/AdminSide/AdminDoctortableInfo.dart';
+import 'package:mcqs/AdminSide/AdminDetailScreen.dart';
 import 'package:mcqs/AdminSide/AdminPatinetInfo.dart';
 import 'package:mcqs/AdminSide/AdminPatinettableInfo.dart';
 
@@ -130,10 +130,10 @@ class _AdminPatientInfoState extends State<AdminPatientInfo> {
             IconButton(
               icon: Icon(Icons.calendar_today),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AdminDoctortableInfo()),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => AdminDoctortableInfo()),
+                // );
               },
             ),
             IconButton(

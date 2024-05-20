@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mcqs/DoctorSide/Appointments.dart';
-import 'package:mcqs/DoctorSide/ApproveApointment.dart';
+
 import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
 import 'package:mcqs/DoctorSide/DoctorRating.dart';
 import 'package:mcqs/PatientMontlySchedule.dart';
@@ -45,10 +44,10 @@ class ConsultationScreen extends StatelessWidget {
               width: 200, // Set a fixed width for the button
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Appointments()),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => Appointments()),
+                  // );
                 },
                 style: ElevatedButton.styleFrom(
                 primary: Colors.green, // Background color
@@ -67,10 +66,10 @@ class ConsultationScreen extends StatelessWidget {
               width: 200,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ApproveAppointment()),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => ApproveAppointment()),
+                  // );
                 },
                 style: ElevatedButton.styleFrom(
                  primary: Colors.green, // Background color

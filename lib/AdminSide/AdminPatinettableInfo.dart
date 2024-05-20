@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mcqs/AdminSide/AdminDoctortableInfo.dart';
+import 'package:mcqs/AdminSide/AdminDetailScreen.dart';
 import 'package:mcqs/AdminSide/AdminPatinetInfo.dart';
 
 class AdminPatienttableInfo extends StatelessWidget {
@@ -74,19 +74,19 @@ class AdminPatienttableInfo extends StatelessWidget {
           children: [
             IconButton(icon: Icon(Icons.home), onPressed: () {
 
-Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => AdminPatientInfo())
-                              )
-                              ;
+// Navigator.push(
+//                               context,
+//                               MaterialPageRoute(builder: (context) => AdminPatientInfo())
+//                               )
+//                               ;
                               },
 
 ),
             IconButton(icon: Icon(Icons.calendar_today), onPressed: () {
-              Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => AdminDoctortableInfo())
-                              );
+              // Navigator.push(
+              //                 context,
+              //                 MaterialPageRoute(builder: (context) => AdminDoctortableInfo())
+              //                 );
             }),
             IconButton(icon: Icon(Icons.lock), onPressed: () {
               Navigator.push(

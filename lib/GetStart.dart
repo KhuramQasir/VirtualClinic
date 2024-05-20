@@ -40,7 +40,7 @@ class GetStart extends StatelessWidget {
           print('Patient ID: $patientId');
           pid=patientId;
           // Evaluate the response and print appropriate message
-          if (message == "Disease find") {
+          if (message == "Have Disease") {
               Navigator.push(context, MaterialPageRoute(builder: (context){
                             return PatientHome();
                           }));

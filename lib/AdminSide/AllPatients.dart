@@ -2,23 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mcqs/AdminSide/AdminDetailScreen.dart';
 import 'package:mcqs/AdminSide/DoctorInfo.dart';
+import 'package:mcqs/AdminSide/PatientInfo.dart';
 import 'dart:convert';
 
 import 'package:mcqs/constants.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: ApproveAdmin(),
-  ));
-}
 
-class ApproveAdmin extends StatefulWidget {
+
+class AllPatients extends StatefulWidget {
   @override
-  _ApproveAdminState createState() => _ApproveAdminState();
+  _AllPatientsState createState() => _AllPatientsState();
 }
 
-class _ApproveAdminState extends State<ApproveAdmin> {
-  List<Map<String, dynamic>> adminRequests = [];
+class _AllPatientsState extends State<AllPatients> {
+  List<Map<String, dynamic>> Allpatient = [];
   bool _isLoading = true;
 
   @override
@@ -28,7 +25,7 @@ class _ApproveAdminState extends State<ApproveAdmin> {
   }
 
   Future<void> fetchAdminRequests() async {
-    final url = Uri.parse('$apiUrl/RegistrationApprovals');
+    final url = Uri.parse('$apiUrl/AllPatients');
     try {
       final response = await http.get(url);
 
@@ -40,7 +37,7 @@ class _ApproveAdminState extends State<ApproveAdmin> {
         if (statusCode == 200) {
           if (mounted) {
             setState(() {
-              adminRequests = List<Map<String, dynamic>>.from(requestData);
+              Allpatient = List<Map<String, dynamic>>.from(requestData);
               _isLoading = false;
             });
           }
@@ -70,73 +67,23 @@ class _ApproveAdminState extends State<ApproveAdmin> {
     }
   }
 
-  Future<void> approveAdmin(int id) async {
-    final url = Uri.parse('$apiUrl/Approve-admin/$id');
-    try {
-      final response = await http.post(url);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final String message = data[0]['message'];
-        final int statusCode = data[1];
-
-        if (statusCode == 200) {
-          setState(() {
-            adminRequests.removeWhere((admin) => admin['id'] == id);
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message)),
-          );
-        } else {
-          print('Failed to approve admin');
-        }
-      } else {
-        print('Failed to approve admin');
-      }
-    } catch (error) {
-      print('Error: $error');
-    }
-  }
-
-  Future<void> rejectAdmin(int id) async {
-    final url = Uri.parse('$apiUrl/delete-admin/$id');
-    try {
-      final response = await http.get(url);
-
-        final data = json.decode(response.body);
-  
- 
-
-       
-          setState(() {
-            adminRequests.removeWhere((admin) => admin['id'] == id);
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response.body)),
-          );
-       
-   
-    } catch (error) {
-      print('Error: $error');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Approve Admin"),
+        title: Text("Patients"),
         centerTitle: true,
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : adminRequests.isEmpty
-              ? Center(child: Text("No admin requests found"))
+          : Allpatient.isEmpty
+              ? Center(child: Text("No Patient requests found"))
               : SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: adminRequests.map((admin) {
+                    children: Allpatient.map((admin) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 32.0),
                         child: _buildItem(context, admin),
@@ -148,14 +95,9 @@ class _ApproveAdminState extends State<ApproveAdmin> {
   }
 
   Widget _buildItem(BuildContext context, Map<String, dynamic> admin) {
-    return  GestureDetector(
-      onTap: (){
-           Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => AdminDetailScreen(adminId: admin['id'],) ),
-    );
-      },
-      child: Card(
+    return  
+     Card(
+        color: Colors.green,
         elevation: 2.0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
@@ -175,11 +117,8 @@ class _ApproveAdminState extends State<ApproveAdmin> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      "Request to connect",
-                      style: TextStyle(fontSize: 16.0),
-                    ),
+                 
+                   
                   ],
                 ),
               ),
@@ -187,25 +126,21 @@ class _ApproveAdminState extends State<ApproveAdmin> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  IconButton(
-                    onPressed: () {
-                      rejectAdmin(admin['id']);
-                    },
-                    icon: Icon(Icons.close, color: Colors.red),
-                  ),
-                  SizedBox(height: 8.0),
-                  IconButton(
-                    onPressed: () {
-                      approveAdmin(admin['id']);
-                    },
-                    icon: Icon(Icons.check_circle_outline, color: Colors.green),
-                  ),
+                  TextButton(onPressed: ()
+                     {
+           Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => PatientInfo(adminId: admin['id'],) ),
+    );
+
+                  }, child:Text('Info',style: TextStyle(color: Colors.white) ,))
+                 
                 ],
               ),
             ],
           ),
         ),
-      ),
+      
     );
   }
 }
