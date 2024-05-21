@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mcqs/AdminSide/AllDoctor.dart';
 import 'package:mcqs/constants.dart';
-
-
 
 class DoctorInfo extends StatefulWidget {
   final int adminId;
@@ -66,7 +65,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                       Center(
                         child: ElevatedButton(
                           onPressed: () {
-                            approveDoctor(context, patientData!['user_id']);
+                            approveDoctor(context, patientData!['id']);
                           },
                           style: ElevatedButton.styleFrom(
                             primary: Colors.green, // Background color
@@ -83,7 +82,6 @@ class _DoctorInfoState extends State<DoctorInfo> {
   }
 
   Future<Map<String, dynamic>> fetchPatientById(int id) async {
-   
     final url = Uri.parse('$apiUrl/get-doctor/$id');
     final response = await http.get(url);
 
@@ -100,27 +98,35 @@ class _DoctorInfoState extends State<DoctorInfo> {
   }
 
   Future<void> approveDoctor(BuildContext context, int id) async {
-  
     final url = Uri.parse('$apiUrl/Approve-doctor/$id');
     try {
-      final response = await http.post(url);
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "role": "doctor",
+        }),
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final String message = data[0]['message'];
-        final int statusCode = data[1];
+       
 
-        if (statusCode == 200) {
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text('Approval Successful'),
-                content: Text(message),
+                content: Text('Approved'),
                 actions: [
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                       Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => AllDoctor()),
+                  );
                     },
                     child: Text('OK'),
                   ),
@@ -128,14 +134,44 @@ class _DoctorInfoState extends State<DoctorInfo> {
               );
             },
           );
-        } else {
-          print('Failed to approve doctor');
-        }
-      } else {
-        print('Failed to approve doctor');
+        }else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Failed to approve doctor. Status code: ${response.statusCode}'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       }
     } catch (error) {
       print('Error: $error');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('An error occurred while approving the doctor.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 }

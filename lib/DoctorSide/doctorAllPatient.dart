@@ -9,12 +9,12 @@ import 'package:mcqs/constants.dart';
 
 
 
-class AllDoctor extends StatefulWidget {
+class DoctorAllPatient extends StatefulWidget {
   @override
-  _AllDoctorState createState() => _AllDoctorState();
+  _DoctorAllPatientState createState() => _DoctorAllPatientState();
 }
 
-class _AllDoctorState extends State<AllDoctor> {
+class _DoctorAllPatientState extends State<DoctorAllPatient> {
   List<Map<String, dynamic>> Allpatient = [];
   bool _isLoading = true;
 
@@ -25,7 +25,7 @@ class _AllDoctorState extends State<AllDoctor> {
   }
 
   Future<void> fetchAdminRequests() async {
-    final url = Uri.parse('$apiUrl/AllDoctors');
+    final url = Uri.parse('$apiUrl/AllPatients');
     try {
       final response = await http.get(url);
 
@@ -72,7 +72,7 @@ class _AllDoctorState extends State<AllDoctor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Doctors"),
+        title: Text("Patients"),
         centerTitle: true,
       ),
       body: _isLoading
@@ -130,7 +130,7 @@ class _AllDoctorState extends State<AllDoctor> {
                      {
            Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => DoctorInfo(adminId: admin['id'],) ),
+      MaterialPageRoute(builder: (context) => PatientInfo(adminId: admin['id'],) ),
     );
 
                   }, child:Text('Info',style: TextStyle(color: Colors.white) ,))

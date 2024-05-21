@@ -8,11 +8,14 @@ import 'package:mcqs/AdminSide/Admindashboard.dart';
 import 'package:mcqs/AdminSide/AllDoctor.dart';
 import 'package:mcqs/AdminSide/AllPatients.dart';
 import 'package:mcqs/AdminSide/DoctorInfo.dart';
-
+import 'package:flutter/material.dart';
 import 'package:mcqs/Api.dart';
 import 'package:mcqs/Camera.dart';
+import 'package:mcqs/DoctorSide/AddQuestion.dart';
 import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
 import 'package:mcqs/DoctorSide/Doctordashboard.dart';
+import 'package:mcqs/DoctorSide/SelectQuestion.dart';
+import 'package:mcqs/DoctorSide/doctorAllPatient.dart';
 import 'package:mcqs/GetStart.dart';
 import 'package:mcqs/Home.dart';
 import 'package:mcqs/Lock.dart';
@@ -38,5 +41,5 @@ void main() async {
   // FlutterError.presentError(details);
   //  };
 
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: Admindashboard()));
+  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: AddQuestion(),));
 }
