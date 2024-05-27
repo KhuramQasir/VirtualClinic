@@ -33,8 +33,7 @@ class SignUpHome extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20), // Adjust radius as needed
-                  ),
-                  primary: Color.fromARGB(255, 205, 31, 31), // Change button color here
+                  ), backgroundColor: Color.fromARGB(255, 205, 31, 31), // Change button color here
                   elevation: 5, // Set elevation here (adjust as needed)
                 ),
                 child: Text(
@@ -57,8 +56,7 @@ class SignUpHome extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20), // Adjust radius as needed
-                  ),
-                  primary: Color.fromARGB(255, 44, 89, 173), // Change button color here
+                  ), backgroundColor: Color.fromARGB(255, 44, 89, 173), // Change button color here
                   elevation: 5, // Set elevation here (adjust as needed)
                 ),
                 child: Text(
@@ -81,8 +79,7 @@ class SignUpHome extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20), // Adjust radius as needed
-                  ),
-                  primary: Colors.green, // Change button color here
+                  ), backgroundColor: Colors.green, // Change button color here
                   elevation: 5, // Set elevation here (adjust as needed)
                 ),
                 child: Text(

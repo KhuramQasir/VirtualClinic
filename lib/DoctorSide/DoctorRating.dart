@@ -61,9 +61,7 @@ class _DoctorRankingState extends State<DoctorRanking> {
               ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  fixedSize: Size(127, 36),
-                  primary: Colors.green, // Background color
-                  onPrimary: Colors.white, // Text color
+                  foregroundColor: Colors.white, backgroundColor: Colors.green, fixedSize: Size(127, 36), // Text color
                 ),
                 child: Text("Rate"),
               ),

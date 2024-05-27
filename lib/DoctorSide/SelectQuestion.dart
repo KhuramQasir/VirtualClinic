@@ -1,13 +1,62 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:mcqs/DoctorSide/Doctordashboard.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:mcqs/DoctorSide/patientRecord.dart';
+import 'package:mcqs/constants.dart';
 
-class SelectQuestion extends StatelessWidget {
+class SelectQuestion extends StatefulWidget {
+  final List<String> PQuestion;
 
- List<String> PQuestion = [];
- 
-SelectQuestion({
- required this.PQuestion
-});
+  SelectQuestion({
+    required this.PQuestion,
+  });
+
+  @override
+  _SelectQuestionState createState() => _SelectQuestionState();
+}
+
+class _SelectQuestionState extends State<SelectQuestion> {
+  List<dynamic> patientAppointments = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDoctorRoster(doctor_id_d); // Assuming doctor ID is 1 for this example
+  }
+
+  Future<void> fetchDoctorRoster(int doctorId) async {
+    final response = await http.get(Uri.parse('$apiUrl/DoctorRoster/$doctorId'));
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      setState(() {
+        patientAppointments = responseData[0]['data']['Patients'];
+      });
+    } else {
+      throw Exception('Failed to load doctor roster');
+    }
+  }
+
+  List<dynamic> getCurrentAppointments() {
+    final now = DateTime.now();
+    final currentTime = TimeOfDay(hour: now.hour, minute: now.minute);
+
+    return patientAppointments.where((appointment) {
+      final startTime = TimeOfDay(
+        hour: int.parse(appointment['start_time'].split(':')[0]),
+        minute: int.parse(appointment['start_time'].split(':')[1]),
+      );
+      final endTime = TimeOfDay(
+        hour: int.parse(appointment['end_time'].split(':')[0]),
+        minute: int.parse(appointment['end_time'].split(':')[1]),
+      );
+
+      return (currentTime.hour > startTime.hour || (currentTime.hour == startTime.hour && currentTime.minute >= startTime.minute)) &&
+             (currentTime.hour < endTime.hour || (currentTime.hour == endTime.hour && currentTime.minute <= endTime.minute));
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -17,8 +66,6 @@ SelectQuestion({
             width: double.infinity,
             child: Column(
               children: [
-             
-                
                 SizedBox(height: 25),
                 Text(
                   "Remaining time 3:49",
@@ -35,34 +82,31 @@ SelectQuestion({
                 ),
                 SizedBox(height: 7),
                 Container(
-                decoration:BoxDecoration(
-                 borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(),
+                  ),
+                  width: 350,
+                  height: 400,
+                  child: ListView.builder(
+                    itemCount: widget.PQuestion.length,
+                    itemBuilder: (context, index) {
+                      final question = widget.PQuestion[index];
 
-                  border: Border.all()
+                      return ListTile(
+                        leading: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        title: Text(question),
+                      );
+                    },
+                  ),
                 ),
-                width: 350,
-                height: 400,
-                child: ListView.builder(
-      itemCount: PQuestion.length,
-      itemBuilder: (context, index) {
-        // Get the current question from the list
-        final question = PQuestion[index];
-
-        return ListTile(
-            leading: Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-          ),
-          title:  Text(question), // Display the question text
-              );
-            },
-          ),
-  
-              ),
                 SizedBox(height: 65),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -73,14 +117,65 @@ SelectQuestion({
                     ),
                     SizedBox(width: 31),
                     ElevatedButton(
-                      onPressed: () {
-                          Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Doctordashboard()),
-                  );
+                      onPressed: () async{
+                        final currentAppointments =await getCurrentAppointments();
+                        if (currentAppointments.isNotEmpty) {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) {
+                            final appointment = currentAppointments.first;
+                            return PatientRcord(pid: appointment['Patient_id']);
+                          }));
+                          // showDialog(
+                          //   context: context,
+                          //   builder: (context) {
+                          //     return AlertDialog(
+                          //       title: Text('Current Appointments'),
+                          //       content: Column(
+                          //         mainAxisSize: MainAxisSize.min,
+                          //         children: currentAppointments.map((appointment) {
+                          //           return Text(
+                          //             'Appointment for patient ID: ${appointment['Patient_id']}\nPatient Name: ${appointment['patientName']}',
+                          //             style: TextStyle(
+                          //               fontSize: 18,
+                          //               fontWeight: FontWeight.bold,
+                          //             ),
+                          //           );
+                          //         }).toList(),
+                          //       ),
+                          //       actions: [
+                          //         ElevatedButton(
+                          //           onPressed: () {
+                          //             Navigator.of(context).pop();
+                          //           },
+                          //           child: Text('OK'),
+                          //         ),
+                          //       ],
+                          //     );
+                          //   },
+                          // );
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('No Current Appointments'),
+                                content: Text(
+                                  'There are no appointments for the current time.',
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
                       },
                       child: Text("End"),
-                      style: ElevatedButton.styleFrom(primary: Colors.red),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     ),
                   ],
                 ),
@@ -92,13 +187,10 @@ SelectQuestion({
         bottomNavigationBar: BottomAppBar(
           child: Padding(
             padding: const EdgeInsets.only(left: 11.0),
-         
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
-
 }
-  

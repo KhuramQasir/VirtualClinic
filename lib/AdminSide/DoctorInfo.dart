@@ -68,8 +68,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
                             approveDoctor(context, patientData!['id']);
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.green, // Background color
-                            onPrimary: Colors.white, // Text color
+                            foregroundColor: Colors.white, backgroundColor: Colors.green, // Text color
                           ),
                           child: Text('Approve Doctor'),
                         ),

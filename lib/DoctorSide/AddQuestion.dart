@@ -74,8 +74,7 @@ class _AddQuestionState extends State<AddQuestion> {
                     },
                     child: const Text("Add"),
                     style: ElevatedButton.styleFrom(
-                      onPrimary: Colors.white,
-                      primary: Colors.green,
+                      foregroundColor: Colors.white, backgroundColor: Colors.green,
                       fixedSize: const Size(127, 36),
                     ),
                   ),
@@ -90,8 +89,7 @@ class _AddQuestionState extends State<AddQuestion> {
                     },
                     child: const Text("Next"),
                     style: ElevatedButton.styleFrom(
-                      onPrimary: Colors.white,
-                      primary: Colors.green,
+                      foregroundColor: Colors.white, backgroundColor: Colors.green,
                       fixedSize: const Size(127, 36),
                     ),
                   ),

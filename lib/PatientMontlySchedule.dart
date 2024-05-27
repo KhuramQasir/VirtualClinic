@@ -1,170 +1,84 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:mcqs/Home.dart';
+import 'package:http/http.dart' as http;
+import 'package:mcqs/constants.dart';
 
-class PatientMonthlySchedule extends StatefulWidget {
-  const PatientMonthlySchedule({Key? key}) : super(key: key);
+
+class PatientSchedulesScreen extends StatefulWidget {
+  const PatientSchedulesScreen({Key? key}) : super(key: key);
+
 
   @override
-  _PatientMonthlyScheduleState createState() =>
-      _PatientMonthlyScheduleState();
+  _PatientSchedulesScreenState createState() => _PatientSchedulesScreenState();
 }
 
-class _PatientMonthlyScheduleState extends State<PatientMonthlySchedule> {
-  List<DateTime?> selectedDates = List.filled(5, null);
+class _PatientSchedulesScreenState extends State<PatientSchedulesScreen> {
+  Future<List<Map<String, dynamic>>>? _schedulesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _schedulesFuture = getPatientSchedules(pid);
+  }
+
+  Future<List<Map<String, dynamic>>> getPatientSchedules(int id) async {
+    final String api = '$apiUrl/getpatientschedules/$id'; // Replace with your actual API URL
+
+    try {
+      final response = await http.get(Uri.parse(api));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data.containsKey('data')) {
+          return List<Map<String, dynamic>>.from(data['data']);
+        } else {
+          print('No data field in response');
+          return [];
+        }
+      } else {
+        print('Failed to load patient schedules: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error: $e');
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Monthly Schedule"),
-        centerTitle: true,
+        title: Text('Patient Schedules'),
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 16),
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                    radius: 12,
-                    // backgroundImage: AssetImage('assets/jamal_avatar.jpg'),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _schedulesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No schedules found'));
+          } else {
+            final schedules = snapshot.data!;
+            return ListView.builder(
+              itemCount: schedules.length,
+              itemBuilder: (context, index) {
+                final schedule = schedules[index];
+                return Card(
+                  child: ListTile(
+                    title: Text('Date: ${schedule['date']}'),
+                    trailing: Text(
+                      'Start Time: ${schedule['start_time']}\nEnd Time: ${schedule['end_time']}',
+                    ),
                   ),
-                  Text(
-                    "Jamal Butt",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Colors.grey,
-                        // backgroundImage: AssetImage('assets/group_icon.jpg'),
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.red,
-                          ),
-                          child: Text(
-                            "3",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "Please Ensure to Meet the Doctor\n         on the Following Dates",
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[100],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                selectedDates[index] != null
-                                    ? " $index - ${selectedDates[index]!.day}/${selectedDates[index]!.month}/${selectedDates[index]!.year} ${selectedDates[index]!.hour}:${selectedDates[index]!.minute}"
-                                    : " $index",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                _selectDateTime(context, index);
-                              },
-                              child: Text("Select Date & Time"),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                    ],
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                navigateToPatientReport(context); // Navigate to another screen
+                );
               },
-              child: Text("Accept"),
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
     );
   }
-
-  // Function to open date picker for a specific index
-  Future<void> _selectDateTime(BuildContext context, int index) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-    );
-    if (pickedDate != null) {
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-      );
-      if (pickedTime != null) {
-        setState(() {
-          selectedDates[index] = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-        });
-      }
-    }
-  }
-
-  // Function to navigate to another screen
-  void navigateToPatientReport(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => HomeScreen()),
-    );
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: PatientMonthlySchedule(),
-  ));
 }

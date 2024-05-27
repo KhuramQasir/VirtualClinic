@@ -1,15 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:mcqs/DoctorSide/Doctordashboard.dart';
+import 'dart:convert';
 
-class DoctorPrescrition extends StatelessWidget {
-  DoctorPrescrition({Key? key}) : super(key: key);
+import 'package:mcqs/constants.dart';
 
+class DoctorPrescription extends StatefulWidget {
+  DoctorPrescription({Key? key}) : super(key: key);
+
+  @override
+  _DoctorPrescriptionState createState() => _DoctorPrescriptionState();
+}
+
+class _DoctorPrescriptionState extends State<DoctorPrescription> {
   TextEditingController prescribedController = TextEditingController();
+  List<String> dropdownItemList = [];
+  String? selectedPrescription;
+  List<String> addedPrescriptions = [];
+  int patientId = patient_id_for_doctor;
 
-  List<String> dropdownItemList = [
-    "Item One",
-    "Item Two",
-    "Item Three",
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchPrescriptions();
+  }
+
+  Future<void> fetchPrescriptions() async {
+  final response = await http.get(Uri.parse('$apiUrl/get_all_prescriptions'));
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final List<String> prescriptions = List<String>.from(data[0]['prescriptions']);
+    setState(() {
+      dropdownItemList = prescriptions.toSet().toList(); // Remove duplicates
+    });
+  } else {
+    throw Exception('Failed to load prescriptions');
+  }
+}
+
+
+Future<void> setPrescriptions() async {
+  final response = await http.post(
+    Uri.parse('$apiUrl/set_prescription/$patientId'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'prescriptions': addedPrescriptions}),
+  );
+
+  if (response.statusCode == 200) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Success'),
+          content: Text('Prescriptions set successfully'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                 Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Doctordashboard()),
+                  );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  } else {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to set prescriptions'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +98,6 @@ class DoctorPrescrition extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
-           
             SizedBox(height: 19),
             Divider(
               color: Color.fromARGB(255, 34, 195, 117).withOpacity(0.86),
@@ -35,15 +112,15 @@ class DoctorPrescrition extends StatelessWidget {
                 style: TextStyle(fontSize: 20),
               ),
             ),
-         
-             SizedBox(height: 19),
-   _buildPrescribed(context),
             SizedBox(height: 19),
             Center(child: _buildDropDown(context)),
             SizedBox(height: 26),
             Center(child: _buildAdd(context)),
             SizedBox(height: 33),
-            Center(child: _buildView(context)),
+            Center(
+                child: Container(
+                    height: 300,
+                    child: SingleChildScrollView(child: _buildView(context)))),
             SizedBox(height: 54),
             Center(child: _buildSet(context)),
             SizedBox(height: 56),
@@ -53,28 +130,8 @@ class DoctorPrescrition extends StatelessWidget {
               endIndent: 20,
             ),
             SizedBox(height: 52),
-           
           ],
         ),
-      ),
-      
-    );
-  }
-
-  
-
-
-
-  
-  
-
-  Widget _buildPrescribed1(BuildContext context) {
-    return TextFormField(
-      controller: prescribedController,
-      decoration: InputDecoration(
-        hintText: "Prescribed",
-        filled: true,
-        fillColor: Colors.green, // Button Background Color
       ),
     );
   }
@@ -83,36 +140,19 @@ class DoctorPrescrition extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 63, vertical: 10),
       child: DropdownButton<String>(
-        hint: Text("Time"),
+        hint: Text("Select Prescription"),
+        value: selectedPrescription,
         items: dropdownItemList.map((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),
           );
         }).toList(),
-        onChanged: (value) {},
-        style: TextStyle(color: Colors.black),
-        underline: Container(
-          height: 2,
-          color: Colors.black,
-        ),
-        icon: Icon(Icons.arrow_drop_down, color: Colors.black),
-        isExpanded: true,
-      ),
-    );
-  }
-  Widget _buildPrescribed(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 63, vertical: 10),
-      child: DropdownButton<String>(
-        hint: Text("Prescribed"),
-        items: dropdownItemList.map((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-        onChanged: (value) {},
+        onChanged: (value) {
+          setState(() {
+            selectedPrescription = value;
+          });
+        },
         style: TextStyle(color: Colors.black),
         underline: Container(
           height: 2,
@@ -125,11 +165,23 @@ class DoctorPrescrition extends StatelessWidget {
   }
 
   Widget _buildAdd(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      child: Text("Add"),
-      style: ElevatedButton.styleFrom(
-        primary: Colors.green, // Button Background Color
+    return SizedBox(
+      width: 100, // Increase the width as needed
+      child: ElevatedButton(
+        onPressed: () {
+          if (selectedPrescription != null) {
+            setState(() {
+              addedPrescriptions.add(selectedPrescription!);
+            });
+          }
+        },
+        child: Text("Add", style: TextStyle(color: Colors.white)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
       ),
     );
   }
@@ -144,62 +196,42 @@ class DoctorPrescrition extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildViewRow("Walk/Morning:"),
-          SizedBox(height: 68),
-          _buildViewRow("Yoga/Anytime:"),
-          SizedBox(height: 67),
-          _buildViewRow("Listen Music/Night:"),
-          SizedBox(height: 7),
-        ],
+        children: addedPrescriptions.map((prescription) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              children: [
+                Container(
+                  height: 6,
+                  width: 6,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+                SizedBox(width: 7),
+                Text(prescription),
+              ],
+            ),
+          );
+        }).toList(),
       ),
-    );
-  }
-
-  Widget _buildViewRow(String text) {
-    return Row(
-      children: [
-        Container(
-          height: 6,
-          width: 6,
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
-        SizedBox(width: 7),
-        Text(text),
-      ],
     );
   }
 
   Widget _buildSet(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      child: Text("Set"),
-      style: ElevatedButton.styleFrom(
-        primary: Colors.green, // Button Background Color
-      ),
-    );
-  }
-
-  Widget _buildBottomBar(BuildContext context) {
-    return BottomAppBar(
-      child: Container(
-        height: 50,
-        color: Colors.blue, // Adjust color as needed
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {},
-            ),
-          ],
+    return SizedBox(
+      width: 100, // Increase the width as needed
+      child: ElevatedButton(
+        onPressed: () {
+          setPrescriptions();
+        },
+        child: Text("Set", style: TextStyle(color: Colors.white)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
         ),
       ),
     );

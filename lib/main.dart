@@ -13,9 +13,12 @@ import 'package:mcqs/Api.dart';
 import 'package:mcqs/Camera.dart';
 import 'package:mcqs/DoctorSide/AddQuestion.dart';
 import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
+import 'package:mcqs/DoctorSide/DoctorSession.dart';
+import 'package:mcqs/DoctorSide/DoctorVideoCall.dart';
 import 'package:mcqs/DoctorSide/Doctordashboard.dart';
 import 'package:mcqs/DoctorSide/SelectQuestion.dart';
 import 'package:mcqs/DoctorSide/doctorAllPatient.dart';
+import 'package:mcqs/DoctorSide/v.dart';
 import 'package:mcqs/GetStart.dart';
 import 'package:mcqs/Home.dart';
 import 'package:mcqs/Lock.dart';
@@ -31,6 +34,7 @@ import 'package:mcqs/Signup.dart';
 import 'package:mcqs/Splash.dart';
 import 'package:mcqs/UploadVideo.dart';
 import 'package:mcqs/VideoCall.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 var cameras;
@@ -41,5 +45,9 @@ void main() async {
   // FlutterError.presentError(details);
   //  };
 
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: AddQuestion(),));
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home:   Splash(),
+  ));
 }
+ 

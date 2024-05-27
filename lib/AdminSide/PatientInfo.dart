@@ -260,8 +260,7 @@ class _PatientInfoState extends State<PatientInfo> {
                         Center(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.green, // background color
-                              onPrimary: Colors.white, // text color
+                              foregroundColor: Colors.white, backgroundColor: Colors.green, // text color
                             ),
                             onPressed: () {
                               updatePatientProfile(

@@ -11,13 +11,15 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  intl: ^0.17.0
   http: ^0.13.3
   google_fonts: ^2.0.0
   camera: ^0.10.5+9
   path_provider: ^2.1.2
   path: ^1.8.3
   image_picker: ^1.0.8
-  video_player: ^2.8.5
+  video_player: ^2.8.6
+  fijkplayer: ^0.11.0
   # multi_image_picker: ^4.8.4
 
 

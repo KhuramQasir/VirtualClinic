@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:mcqs/McqsWithResponse.dart';
 import 'package:mcqs/PatientHome.dart';
 import 'package:mcqs/constants.dart';
@@ -15,6 +16,116 @@ class GetStart extends StatelessWidget {
     // double ffem = MediaQuery.of(context).size.width / 400;
     double fem = 1; // You should define your fem value appropriately
     double ffem = 1; // You should define your ffem value appropriately
+
+
+ Future<int> getPatientDoctor(String id) async {
+    final url = Uri.parse('$apiUrl/getpatientdoctor/$id');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+       Map<String, dynamic> data = jsonDecode(response.body);
+       int doctorId = data['Doctor_id'];
+     // Assuming data is a Map<String, dynamic>
+      
+
+
+      return doctorId; 
+    } else {
+      throw Exception('Failed to load patient-doctor data');
+    }
+  }
+  
+Future<String> checkDoctor(String patientId) async {
+  final url = Uri.parse('$apiUrl/check_doctor');
+  try {
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'patient_id': patientId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data.isNotEmpty && data[0].containsKey('message')) {
+        return data[0]['message'];
+      } else {
+        throw Exception('Invalid response format');
+      }
+    } else {
+      throw Exception('Failed to check doctor');
+    }
+  } catch (e) {
+    throw Exception('Network error: $e');
+  }
+}
+
+
+  
+  Future<int> storePatientHistory(
+  String doctorId,
+  String patientId,
+  String status,
+  int doctorRanking,
+  String visitType,
+  String visitDate,
+) async {
+  final String Url = '$apiUrl/storepatienthistory';
+
+  try {
+    final response = await http.post(
+      Uri.parse(Url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'doctor_id': doctorId,
+        'patient_id': patientId,
+        'status': status,
+        'doctorranking': doctorRanking,
+        'visit_type': visitType,
+        'visit_date': visitDate,
+      }),
+    );
+print(response.body);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      int phid=data['Patienthistoryid'];
+      return phid;
+    } else {
+      print('Failed to store patient history: ${response.statusCode}');
+     return 0;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return 0;
+  }
+}
+
+Future<void> completeQuestionnaire(String patientId) async {
+  final url = Uri.parse('$apiUrl/complete_questionnaire');
+  // Replace 'your_server_address' with the actual address of your server
+
+  try {
+    await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'patient_id': patientId,
+      }),
+    );
+  } catch (e) {
+    throw Exception('Network error: $e');
+  }
+}
+
+
+
 
  Future<void> findDisease(String id) async {
   final url = Uri.parse('$apiUrl/find_disease/$id');
@@ -39,8 +150,25 @@ class GetStart extends StatelessWidget {
           print('Message: $message');
           print('Patient ID: $patientId');
           pid=patientId;
+
           // Evaluate the response and print appropriate message
           if (message == "Have Disease") {
+           String msg=await  checkDoctor(pid.toString());
+             print('Doctor Assign');
+                print(msg);
+            if(msg=="No"){
+              completeQuestionnaire(pid.toString());
+            }
+
+            int doctorid=await getPatientDoctor(patientId.toString());
+             print('Doctor Id');
+               String visitDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+             int patienthistoryid=await storePatientHistory(doctorid.toString(), pid.toString(), 'active', 0, 'Session', visitDate.toString());
+             print('Patient History Id');
+             print(patienthistoryid);
+              phid=patienthistoryid; 
+             
               Navigator.push(context, MaterialPageRoute(builder: (context){
                             return PatientHome();
                           }));
@@ -64,6 +192,9 @@ class GetStart extends StatelessWidget {
     print('Error occurred: $e');
   }
 }
+
+
+
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -160,10 +291,3 @@ class GetStart extends StatelessWidget {
   }
 }
 
-
-
-void main() {
-  runApp(MaterialApp(
-    home: GetStart(),
-  ));
-}

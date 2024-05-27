@@ -171,7 +171,7 @@ print(patientid);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PatientHome(),
+                      builder: (context) => GetStart(),
                     ),
                   );
                 },

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path; // Add this import
 import 'package:mcqs/Camera.dart';
 import 'package:mcqs/Home.dart';
 import 'constants.dart';
@@ -34,11 +35,14 @@ class _WelcomeScreenState extends State<Session> {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('$apiUrl/add_patient_session_response'));
 
+      // Extract only the file name of the stimuli image
+      String stimuliImageName = path.basename(stimuliImg);
+
       // Add fields to the request
       request.fields['selected_option'] = selectionOption;
       request.fields['session_details_id'] = selectionDetailsId.toString();
       request.fields['patient_history_id'] = patientHistoryId.toString();
-      request.fields['stimuli_img'] = stimuliImg;
+      request.fields['stimuli_img'] = stimuliImageName;
 
       // Add image file to the request
       request.files.add(await http.MultipartFile.fromPath('patient_response_image', patientResponseImage.path));
@@ -228,7 +232,7 @@ class _WelcomeScreenState extends State<Session> {
                         }
                         _initializeCamera();
                         postData(
-                          patientHistoryId: pid,
+                          patientHistoryId: phid,
                           patientResponseImage: File(_capturedImagePath!),
                           selectionDetailsId: 4,
                           selectionOption: selectedOption!,

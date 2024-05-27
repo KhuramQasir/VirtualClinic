@@ -5,9 +5,6 @@ import 'package:mcqs/Session.dart';
 import 'package:mcqs/UploadVideo.dart';
 import 'package:mcqs/VideoCall.dart';
 
-void main() {
-  runApp(PatientHome());
-}
 
 class PatientHome extends StatelessWidget {
   @override
@@ -19,7 +16,7 @@ class PatientHome extends StatelessWidget {
         ),
         body: ConsultationScreen(),
       ),
-      routes: {
+      routes: { 
         '/session': (context) => Session(),
         // Define route for Session Screen
       },
@@ -47,12 +44,11 @@ class ConsultationScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => PatientMonthlySchedule()));
+                        builder: (context) => PatientSchedulesScreen()));
               },
               child: Text('View Appointments'),
               style: ElevatedButton.styleFrom(
-                primary: Colors.green, // Set background color to green
-                onPrimary: Colors.white, // Set text color to white
+                foregroundColor: Colors.white, backgroundColor: Colors.green, // Set text color to white
               ),
             ),
           ),
@@ -70,8 +66,7 @@ class ConsultationScreen extends StatelessWidget {
               },
               child: Text('Start Session'),
               style: ElevatedButton.styleFrom(
-                primary: Colors.green,
-                onPrimary: Colors.white,
+                foregroundColor: Colors.white, backgroundColor: Colors.green,
               ),
             ),
           ),
@@ -91,8 +86,7 @@ class ConsultationScreen extends StatelessWidget {
               },
               child: Text('Start Video'),
               style: ElevatedButton.styleFrom(
-                primary: Colors.green,
-                onPrimary: Colors.white,
+                foregroundColor: Colors.white, backgroundColor: Colors.green,
               ),
             ),
           ),
@@ -114,8 +108,7 @@ class ConsultationScreen extends StatelessWidget {
               },
               child: Text('Check Report'),
               style: ElevatedButton.styleFrom(
-                primary: Colors.green,
-                onPrimary: Colors.white,
+                foregroundColor: Colors.white, backgroundColor: Colors.green,
               ),
             ),
           ),

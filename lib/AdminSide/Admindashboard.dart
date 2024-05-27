@@ -223,8 +223,7 @@ class Admindashboard extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          primary: Colors.green, // Background color
-          onPrimary: Colors.white, // Text color
+          foregroundColor: Colors.white, backgroundColor: Colors.green, // Text color
         ),
         child: Text(text),
       ),
@@ -243,8 +242,7 @@ class Admindashboard extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          primary: Colors.green, // Background color
-          onPrimary: Colors.white, // Text color
+          foregroundColor: Colors.white, backgroundColor: Colors.green, // Text color
         ),
         child: Text(text),
       ),
@@ -262,8 +260,7 @@ class Admindashboard extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          primary: Colors.green, // Background color
-          onPrimary: Colors.white, // Text color
+          foregroundColor: Colors.white, backgroundColor: Colors.green, // Text color
         ),
         child: Text(text),
       ),

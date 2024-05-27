@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:intl/intl.dart';
+import 'package:mcqs/DoctorSide/AddQuestion.dart';
+import 'package:mcqs/DoctorSide/ApprovePatient.dart';
+import 'package:mcqs/DoctorSide/DoctorAppointment.dart';
 import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
 import 'package:mcqs/DoctorSide/DoctorRating.dart';
+import 'package:mcqs/DoctorSide/DoctorSession.dart';
+import 'package:mcqs/DoctorSide/DoctorVideoCall.dart';
+import 'package:mcqs/DoctorSide/SelectQuestion.dart';
+import 'package:mcqs/DoctorSide/doctorAllPatient.dart';
+import 'package:mcqs/DoctorSide/patientHistoryforDoctoe.dart';
 import 'package:mcqs/PatientMontlySchedule.dart';
 import 'package:mcqs/PatientReport.dart';
 import 'package:mcqs/Session.dart';
 import 'package:mcqs/UploadVideo.dart';
 import 'package:mcqs/VideoCall.dart';
+import 'package:mcqs/constants.dart';
 
 class Doctordashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      showSemanticsDebugger: false,
       home: Scaffold(
         appBar: AppBar(
           title: Text('Doctor'),
@@ -26,7 +38,63 @@ class Doctordashboard extends StatelessWidget {
   }
 }
 
-class ConsultationScreen extends StatelessWidget {
+class ConsultationScreen extends StatefulWidget {
+  @override
+  _ConsultationScreenState createState() => _ConsultationScreenState();
+}
+
+class _ConsultationScreenState extends State<ConsultationScreen> {
+  @override
+  void initState() {
+    super.initState();
+    checkPatientSchedule();
+    print('Doctor Id = $doctor_id_d');
+  }
+
+  Future<void> checkPatientSchedule() async {
+    final int doctorId = 1; // Replace with actual doctor ID
+    final response = await http.get(Uri.parse('$apiUrl/DoctorRoster/$doctorId'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final patients = data[0]['data']['Patients'];
+      final currentTime = DateTime.now();
+
+      for (var patient in patients) {
+        final startTime = DateFormat.Hms().parse(patient['start_time']);
+        final endTime = DateFormat.Hms().parse(patient['end_time']);
+        final startTimeToday = DateTime(currentTime.year, currentTime.month, currentTime.day, startTime.hour, startTime.minute, startTime.second);
+        final endTimeToday = DateTime(currentTime.year, currentTime.month, currentTime.day, endTime.hour, endTime.minute, endTime.second);
+
+        if (currentTime.isAfter(startTimeToday) && currentTime.isBefore(endTimeToday)) {
+            setState(() {
+            patient_id_for_doctor = patient['Patient_id'];
+          });
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Patient Schedule'),
+                content: Text('Patient ID: ${patient['Patient_id']}\nPatient: ${patient['patientName']}\nDisease: ${patient['disease']}\nTime: ${patient['start_time']} - ${patient['end_time']}'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+          break;
+        }
+      }
+    } else {
+      print('Failed to load patient schedule');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -44,14 +112,14 @@ class ConsultationScreen extends StatelessWidget {
               width: 200, // Set a fixed width for the button
               child: ElevatedButton(
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => Appointments()),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DoctorAppointment()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
-                primary: Colors.green, // Background color
-                  onPrimary: Colors.white, // Text color// Set the text color to white
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green, // Text color
                 ),
                 child: Text('Check Appoint'),
               ),
@@ -66,14 +134,14 @@ class ConsultationScreen extends StatelessWidget {
               width: 200,
               child: ElevatedButton(
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => ApproveAppointment()),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ApprovePatients()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
-                 primary: Colors.green, // Background color
-                  onPrimary: Colors.white, // Text color
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green, // Text color
                 ),
                 child: Text('Check'),
               ),
@@ -88,18 +156,21 @@ class ConsultationScreen extends StatelessWidget {
               width: 200,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/session');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PatientSessionResponsesScreen(phid: patient_id_for_doctor)),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
-                 primary: Colors.green, // Background color
-                  onPrimary: Colors.white, // Text color
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green, // Text color
                 ),
                 child: Text('Start Session'),
               ),
             ),
             SizedBox(height: 20),
             Text(
-              'Doctor Ranking',
+              'Add Questions',
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 10),
@@ -109,19 +180,19 @@ class ConsultationScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => DoctorRanking()),
+                    MaterialPageRoute(builder: (context) => AddQuestion()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.green, // Background color
-                  onPrimary: Colors.white, // Text color
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green, // Text color
                 ),
-                child: Text('Doctor Ranking'),
+                child: Text('Questions'),
               ),
             ),
             SizedBox(height: 20),
             Text(
-              'Prescrition',
+              'Video Call',
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 10),
@@ -131,12 +202,34 @@ class ConsultationScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => DoctorPrescrition()),
+                    MaterialPageRoute(builder: (context) => PatientVideoResponseScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.green, // Background color
-                  onPrimary: Colors.white, // Text color
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green, // Text color
+                ),
+                child: Text('Video Call'),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Patient Records',
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DisplayAllPatientsToDoctor(doctorId: doctor_id_d,)),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green, // Text color
                 ),
                 child: Text('View'),
               ),

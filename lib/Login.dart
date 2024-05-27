@@ -55,18 +55,16 @@ class _LoginState extends State<Login> {
     if (statusCode == 200) {
      
       if (message == 'Patient login') {
-       
+
         userId=await responseBody[0]['user_id'];
        patientid=userId;
 
-
-        
          Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => GetStart() ),
     );
       } else if (message == "Doctor login") {
-       
+       did=userId;
          Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => Doctordashboard()),
@@ -77,8 +75,14 @@ class _LoginState extends State<Login> {
       context,
       MaterialPageRoute(builder: (context) => Admindashboard()),
     );
-      } else {
-       
+      } else  if(message=="junior_doctor login"){
+            
+         int id=await responseBody[0]['doctor_id'];
+         doctor_id_d=id;
+        Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Doctordashboard()),
+    );
       }
 
       // Now you have the userId and userType, you can use/store them as needed
