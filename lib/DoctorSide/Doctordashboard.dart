@@ -6,7 +6,7 @@ import 'package:mcqs/DoctorSide/AddQuestion.dart';
 import 'package:mcqs/DoctorSide/ApprovePatient.dart';
 import 'package:mcqs/DoctorSide/DoctorAppointment.dart';
 import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
-import 'package:mcqs/DoctorSide/DoctorRating.dart';
+import 'package:mcqs/Super%20Doctor/DoctorRating.dart';
 import 'package:mcqs/DoctorSide/DoctorSession.dart';
 import 'package:mcqs/DoctorSide/DoctorVideoCall.dart';
 import 'package:mcqs/DoctorSide/SelectQuestion.dart';

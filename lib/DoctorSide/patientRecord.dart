@@ -102,7 +102,7 @@ class _PatientRcordState extends State<PatientRcord> {
                       onPressed: () {
                        Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => PatientDetailsScreen(patient_id: patient_id_for_doctor,)),
+                    MaterialPageRoute(builder: (context) => patientQuestionResponse(patient_id: patient_id_for_doctor, phid: patient_id_for_doctor,)),
                   );
                 },
                      

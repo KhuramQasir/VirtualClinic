@@ -105,12 +105,34 @@ print(response.body);
   }
 }
 
-Future<void> completeQuestionnaire(String patientId) async {
+
+void _showDialog(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Response'),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
+Future<void> completeQuestionnaire(BuildContext context, String patientId) async {
   final url = Uri.parse('$apiUrl/complete_questionnaire');
-  // Replace 'your_server_address' with the actual address of your server
 
   try {
-    await http.post(
+    final response = await http.post(
       url,
       headers: <String, String>{
         'Content-Type': 'application/json',
@@ -119,11 +141,45 @@ Future<void> completeQuestionnaire(String patientId) async {
         'patient_id': patientId,
       }),
     );
+
+    String message;
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseBody = jsonDecode(response.body);
+
+      if (responseBody.containsKey('message')) {
+        final messageData = responseBody['message'];
+
+        if (messageData is List) {
+          bool found = false;
+
+          for (var item in messageData) {
+            if (item['patient_id'].toString() == patientId) {
+              found = true;
+              break;
+            }
+          }
+
+          if (found) {
+            message = 'Request sent successfully. Waiting For Approval';
+          } else {
+            message = 'Request successful, but no matching patient_id found.';
+          }
+        } else {
+          message = 'Request already in a Queue';
+        }
+      } else {
+        message = 'No data found.';
+      }
+    } else {
+      message = 'Failed to complete the questionnaire. Server responded with status code: ${response.statusCode}';
+    }
+
+    _showDialog(context, message);
   } catch (e) {
-    throw Exception('Network error: $e');
+    _showDialog(context, 'Network error: $e');
   }
 }
-
 
 
 
@@ -157,7 +213,7 @@ Future<void> completeQuestionnaire(String patientId) async {
              print('Doctor Assign');
                 print(msg);
             if(msg=="No"){
-              completeQuestionnaire(pid.toString());
+                 completeQuestionnaire(context, pid.toString()); // Replace '9' with the actual patient ID you want to test with
             }
 
             int doctorid=await getPatientDoctor(patientId.toString());

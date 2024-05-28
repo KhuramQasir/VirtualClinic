@@ -6,7 +6,7 @@ import 'package:mcqs/constants.dart';
 class patientQuestionResponse extends StatefulWidget {
   final int phid;
 
-  patientQuestionResponse({required this.phid});
+  patientQuestionResponse({required this.phid, required int patient_id});
 
   @override
   _patientQuestionResponseState createState() => _patientQuestionResponseState();

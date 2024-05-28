@@ -32,6 +32,7 @@ import 'package:mcqs/Session.dart';
 
 import 'package:mcqs/Signup.dart';
 import 'package:mcqs/Splash.dart';
+import 'package:mcqs/Super%20Doctor/SuperDoctorDashboard.dart';
 import 'package:mcqs/UploadVideo.dart';
 import 'package:mcqs/VideoCall.dart';
 import 'package:path/path.dart';
@@ -47,7 +48,7 @@ void main() async {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home:   Splash(),
+    home:   BottomNavigationBarExample(),
   ));
 }
  
