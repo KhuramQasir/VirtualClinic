@@ -2,12 +2,16 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:mcqs/AdminSide/Admindashboard.dart';
+import 'package:mcqs/DoctorSide/DoctorHomeNavigation.dart';
 import 'package:mcqs/DoctorSide/Doctordashboard.dart';
 import 'package:mcqs/GetStart.dart';
 
 import 'package:mcqs/Home.dart';
 import 'package:mcqs/PatientHome.dart';
+import 'package:mcqs/Super%20Doctor/SuperDoctorDashboard.dart';
+import 'package:mcqs/Super%20Doctor/home.dart';
 import 'package:mcqs/constants.dart';
+import 'package:mcqs/patientNavigationBar.dart';
 import 'signup.dart'; // Import the Signup screen file
 import 'package:mcqs/constants.dart'; 
 class Login extends StatefulWidget {
@@ -67,7 +71,7 @@ class _LoginState extends State<Login> {
        did=userId;
          Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => Doctordashboard()),
+      MaterialPageRoute(builder: (context) => DoctorHomeNavigation()),
     );
       } else if (message == "Admin login") {
        
@@ -78,18 +82,29 @@ class _LoginState extends State<Login> {
       } else  if(message=="junior_doctor login"){
             
          int id=await responseBody[0]['doctor_id'];
+         
          doctor_id_d=id;
+       
+         print(doctor_id_d);
         Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DoctorHomeNavigation()),
+        );
+      }
+      else if (message == "senior_doctor login") {
+      int id=await responseBody[0]['doctor_id'];
+      print('Senior Doctor');
+        print(senior_doctor_id);
+       senior_doctor_id=id;
+         Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => Doctordashboard()),
+      MaterialPageRoute(builder: (context) => BottomNavigationBarExample()),
     );
       }
 
-      // Now you have the userId and userType, you can use/store them as needed
-      print("User ID: $userId");
     
     
-    } else {
+    }   else {
       // Login failed
       var responseBody = json.decode(response.body);
       var message = responseBody[0]['message'];

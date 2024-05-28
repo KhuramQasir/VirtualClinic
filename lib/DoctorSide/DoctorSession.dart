@@ -174,6 +174,18 @@ Widget build(BuildContext context) {
                   onPressed: onNextPressed,
                   child: Text('Next'),
                 ),
+                SizedBox(height: 10,),
+                  Container(
+                    color: Colors.red,
+                    height: 50,
+                    width: 300,
+                    child: Center(
+                      child: Text(
+                        response['diagnostic'],
+                        style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.white), // Adjust the font size as needed
+                      ),
+                    ),
+                  )
               ],
             );
           }

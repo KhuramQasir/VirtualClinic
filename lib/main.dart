@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:mcqs/Api.dart';
 import 'package:mcqs/Camera.dart';
 import 'package:mcqs/DoctorSide/AddQuestion.dart';
+import 'package:mcqs/DoctorSide/DoctorHomeNavigation.dart';
 import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
 import 'package:mcqs/DoctorSide/DoctorSession.dart';
 import 'package:mcqs/DoctorSide/DoctorVideoCall.dart';
@@ -48,7 +49,7 @@ void main() async {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home:   BottomNavigationBarExample(),
+    home:   Splash(),
   ));
 }
  

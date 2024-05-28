@@ -20,14 +20,14 @@ import 'package:mcqs/VideoCall.dart';
 import 'package:mcqs/constants.dart';
 
 class Doctordashboard extends StatelessWidget {
+  const Doctordashboard({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       showSemanticsDebugger: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Doctor'),
-        ),
+        
         body: ConsultationScreen(),
       ),
       routes: {
@@ -103,137 +103,495 @@ class _ConsultationScreenState extends State<ConsultationScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: 20),
-            Text(
-              'Appointments',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 10),
-            SizedBox(
-              width: 200, // Set a fixed width for the button
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => DoctorAppointment()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.green, // Text color
-                ),
-                child: Text('Check Appoint'),
+
+           Container(
+            
+            decoration: BoxDecoration(
+              borderRadius:BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5),
+                      ),
+
+              color: Colors.white,
+              boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],),
+          width: 300,
+          height: 105,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 70),
+                      child: Text(
+                        'Appointments',
+                        style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Approve Patient',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
+              Row(
+                children: [
+                  Container(
+                    child: Text(
+                      'Patients to Check Today',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                width: 300,
+                decoration: BoxDecoration(
+                  
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DoctorAppointment()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green, // Background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0),
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: Text('Check Appoint'),
+                ),
+              ),
+
+            ],
+          ),
+        ),
+
+
+
+
+
+
+
+
+        SizedBox(height: 30,),
+         Container(
+            
+            decoration: BoxDecoration(
+              borderRadius:BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5),
+                      ),
+
+              color: Colors.white,
+              boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],),
+          width: 300,
+          height: 105,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 70),
+                      child: Text(
+                        'Approve Patient',
+                        style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    child: Text(
+                      'Give your approval to treat the patient',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                width: 300,
+                decoration: BoxDecoration(
+                  
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                     Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ApprovePatients()),
                   );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.green, // Text color
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green, // Background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0),
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: Text('Check Appoint'),
                 ),
-                child: Text('Check'),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Session',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
+
+            ],
+          ),
+        ),
+        
+          
+
+
+           SizedBox(height: 30,),
+         Container(
+            
+            decoration: BoxDecoration(
+              borderRadius:BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5),
+                      ),
+
+              color: Colors.white,
+              boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],),
+          width: 300,
+          height: 105,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 70),
+                      child: Text(
+                        'Sessions',
+                        style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    child: Text(
+                      'Regular check up of patient',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                width: 300,
+                decoration: BoxDecoration(
+                  
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                      Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => PatientSessionResponsesScreen(phid: patient_id_for_doctor)),
                   );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.green, // Text color
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green, // Background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0),
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: Text('Start Session'),
                 ),
-                child: Text('Start Session'),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Add Questions',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddQuestion()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.green, // Text color
+
+            ],
+          ),
+        ),
+        
+
+
+
+          SizedBox(height: 30,),
+         Container(
+            
+            decoration: BoxDecoration(
+              borderRadius:BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5),
+                      ),
+
+              color: Colors.white,
+              boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],),
+          width: 300,
+          height: 105,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 70),
+                      child: Text(
+                        'Video Call',
+                        style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    child: Text(
+                      'Video Call',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                width: 300,
+                decoration: BoxDecoration(
+                  
                 ),
-                child: Text('Questions'),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Video Call',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
+                child: ElevatedButton(
+                  onPressed: () {
+                     Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => PatientVideoResponseScreen()),
                   );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.green, // Text color
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green, // Background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0),
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: Text('Video Call'),
                 ),
-                child: Text('Video Call'),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Patient Records',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
+
+            ],
+          ),
+        ),
+
+
+
+
+
+  SizedBox(height: 30,),
+         Container(
+            
+            decoration: BoxDecoration(
+              borderRadius:BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5),
+                      ),
+
+              color: Colors.white,
+              boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],),
+          width: 300,
+          height: 105,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 70),
+                      child: Text(
+                        'Add Question',
+                        style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    child: Text(
+                      'Add Question',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                width: 300,
+                decoration: BoxDecoration(
+                  
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                   
+                    Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddQuestion()),
+                  );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green, // Background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0),
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: Text('Questions'),
+                ),
+              ),
+
+            ],
+          ),
+        ),
+
+
+
+
+
+
+
+SizedBox(height: 30,),
+         Container(
+            
+            decoration: BoxDecoration(
+              borderRadius:BorderRadius.only(
+                        topLeft: Radius.circular(5),
+                        topRight: Radius.circular(5),
+                      ),
+
+              color: Colors.white,
+              boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],),
+          width: 300,
+          height: 105,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 70),
+                      child: Text(
+                        'Patient Records',
+                        style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    child: Text(
+                      'See all detail of Patient',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                width: 300,
+                decoration: BoxDecoration(
+                  
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => DisplayAllPatientsToDoctor(doctorId: doctor_id_d,)),
                   );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.green, // Text color
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green, // Background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0),
+                        bottomLeft: Radius.circular(5),
+                        bottomRight: Radius.circular(5),
+                      ),
+                    ),
+                  ),
+                  child: Text('View'),
                 ),
-                child: Text('View'),
               ),
-            ),
+
+            ],
+          ),
+        ),
+
+
+
+
           ],
         ),
       ),

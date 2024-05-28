@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mcqs/constants.dart';
 
-void main() {
-  runApp(DoctorAppointment());
-}
 
 class DoctorAppointment extends StatelessWidget {
   @override

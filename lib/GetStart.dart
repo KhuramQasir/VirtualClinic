@@ -9,6 +9,8 @@ import 'package:mcqs/PatientHome.dart';
 import 'package:mcqs/constants.dart';
 
 class GetStart extends StatelessWidget {
+  const GetStart({Key? key}) : super(key: key);
+
   
   @override
   Widget build(BuildContext context) {
@@ -251,98 +253,84 @@ Future<void> completeQuestionnaire(BuildContext context, String patientId) async
 
 
 
-
     return Scaffold(
+      appBar: AppBar(  title: Center(child: Image.asset('lib/images/logo.jpg')),),
       body: SingleChildScrollView(
-        child: Center(
+  child: Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 20), // Adjusted for less space
+          child: Text(
+            'Welcome to the Psychologist Test\n',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+              color: Color(0xff111111),
+            ),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20), // Adjusted for less space
+          width: double.infinity,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-        
               Container(
-                margin: EdgeInsets.fromLTRB(7 * fem, 77 * fem, 0 * fem, 0 * fem),
-                child: Text(
-                  'Welcome to the Psychologist Test\n',
-                  style: TextStyle(
-                    fontSize: 22 * ffem,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2 * ffem / fem,
-                    color: Color(0xff111111),
+                margin: EdgeInsets.symmetric(vertical: 20), // Adjusted for less space
+                width: 281,
+                height: 350,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'lib/images/Rectangle 83.jpg',
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.fromLTRB(39 * fem, 59 * fem, 35 * fem, 178 * fem),
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.fromLTRB(1 * fem, 15 * fem, 0 * fem, 103 * fem),
-                      width: 281 * fem,
-                      height: 350 * fem,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20 * fem),
-                        child: Image.asset(
-                          'lib/images/Rectangle 83.jpg',
-                          fit: BoxFit.cover,
-                        ),
+              GestureDetector(
+                onTap: () async {
+                  var res = await findDisease(patientid.toString());
+                  // Handle the response accordingly
+                },
+                child: Container(
+                  width: 190,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Color(0xff0ebe7f),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xff000000),
+                        offset: Offset(0, 0),
+                        blurRadius: 3.5,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Get Started',
+                      style: TextStyle(
+                        fontSize: 19.3,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
+                        color: Color(0xffffffff),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () async{
-                     
-                     
-                        var res=await findDisease(patientid.toString());
-                
-                      // if(res==true){
-                      //     Navigator.push(context, MaterialPageRoute(builder: (context){
-                      //       return PatientHome();
-                      //     }));
-                      // }else if(res==false){
-                      //    Navigator.push(context, MaterialPageRoute(builder: (context){
-                      //       return McqsWithResponse();
-                      //     }));
-                      // }
-
-
-
-                       
-                      },
-                      child: Container(
-                        width: 190,
-                        height: 40 * fem,
-                        decoration: BoxDecoration(
-                          color: Color(0xff0ebe7f),
-                          borderRadius: BorderRadius.circular(20 * fem),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xff000000),
-                              offset: Offset(0 * fem, 0 * fem),
-                              blurRadius: 3.5 * fem,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Get Started',
-                            style: TextStyle(
-                              fontSize: 19.2903232574 * ffem,
-                              fontWeight: FontWeight.w800,
-                              height: 1.2 * ffem / fem,
-                              color: Color(0xffffffff),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
           ),
         ),
-      ),
+      ],
+    ),
+  ),
+),
+
+
     );
   }
 }

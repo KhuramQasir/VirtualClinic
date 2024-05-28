@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mcqs/Super%20Doctor/sessionResponse.dart';
+import 'package:mcqs/Super%20Doctor/videoResponse.dart';
 
 class twoButtonsScreen extends StatelessWidget {
-  const twoButtonsScreen({Key? key}) : super(key: key);
+  String pid,date;
+  twoButtonsScreen({required this.date,required this.pid});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,9 @@ class twoButtonsScreen extends StatelessWidget {
                   ),
                                 ),
                                 onPressed: () {
-                  // Button pressed action
+                   Navigator.push(context, MaterialPageRoute(builder: (context){
+                      return SuperDoctorSessionResponse(patientid: pid,date: date,);
+                  }));
                                 },
                                 child: Text('Stimuli Session',style: TextStyle(color: Colors.white),),
                               ),
@@ -46,7 +51,9 @@ class twoButtonsScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // Button pressed action
+                  Navigator.push(context, MaterialPageRoute(builder: (context){
+                      return SuperDoctorVideoResponse(patientid: pid,date: date,);
+                  }));
                 },
                 child: Text('Video Response',style: TextStyle(color: Colors.white),),
               ),

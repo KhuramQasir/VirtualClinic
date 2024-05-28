@@ -116,7 +116,7 @@ class _PrescriptionListPageState extends State<PrescriptionListPage> {
                           ),
                           trailing: IconButton(onPressed: (){
                             Navigator.push(context, MaterialPageRoute(builder: (context){
-                              return twoButtonsScreen();
+                              return twoButtonsScreen(pid: widget.patientId.toString(),date: prescriptions[index].date,);
                             }));
                           }, icon: Icon(Icons.view_agenda,color: Colors.white)),
                         ),
