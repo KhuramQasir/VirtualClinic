@@ -105,7 +105,7 @@ class _DoctorInfoState extends State<DoctorInfo> {
           "Content-Type": "application/json",
         },
         body: jsonEncode({
-          "role": "doctor",
+          "role": "junior_doctor",
         }),
       );
 

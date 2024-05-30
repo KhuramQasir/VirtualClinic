@@ -52,7 +52,7 @@ class _ConsultationScreenState extends State<ConsultationScreen> {
   }
 
   Future<void> checkPatientSchedule() async {
-    final int doctorId = 1; // Replace with actual doctor ID
+    final int doctorId = doctor_id_d; // Replace with actual doctor ID
     final response = await http.get(Uri.parse('$apiUrl/DoctorRoster/$doctorId'));
 
     if (response.statusCode == 200) {
@@ -241,7 +241,7 @@ class _ConsultationScreenState extends State<ConsultationScreen> {
                   onPressed: () {
                      Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ApprovePatients()),
+                    MaterialPageRoute(builder: (context) => ApprovePatient()),
                   );
                   },
                   style: ElevatedButton.styleFrom(
@@ -268,167 +268,7 @@ class _ConsultationScreenState extends State<ConsultationScreen> {
 
 
            SizedBox(height: 30,),
-         Container(
-            
-            decoration: BoxDecoration(
-              borderRadius:BorderRadius.only(
-                        topLeft: Radius.circular(5),
-                        topRight: Radius.circular(5),
-                      ),
-
-              color: Colors.white,
-              boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],),
-          width: 300,
-          height: 105,
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 70),
-                      child: Text(
-                        'Sessions',
-                        style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Container(
-                    child: Text(
-                      'Regular check up of patient',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                width: 300,
-                decoration: BoxDecoration(
-                  
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                      Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PatientSessionResponsesScreen(phid: patient_id_for_doctor)),
-                  );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.green, // Background color
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(0),
-                        topRight: Radius.circular(0),
-                        bottomLeft: Radius.circular(5),
-                        bottomRight: Radius.circular(5),
-                      ),
-                    ),
-                  ),
-                  child: Text('Start Session'),
-                ),
-              ),
-
-            ],
-          ),
-        ),
         
-
-
-
-          SizedBox(height: 30,),
-         Container(
-            
-            decoration: BoxDecoration(
-              borderRadius:BorderRadius.only(
-                        topLeft: Radius.circular(5),
-                        topRight: Radius.circular(5),
-                      ),
-
-              color: Colors.white,
-              boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],),
-          width: 300,
-          height: 105,
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 70),
-                      child: Text(
-                        'Video Call',
-                        style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Container(
-                    child: Text(
-                      'Video Call',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                width: 300,
-                decoration: BoxDecoration(
-                  
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                     Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PatientVideoResponseScreen()),
-                  );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.green, // Background color
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(0),
-                        topRight: Radius.circular(0),
-                        bottomLeft: Radius.circular(5),
-                        bottomRight: Radius.circular(5),
-                      ),
-                    ),
-                  ),
-                  child: Text('Video Call'),
-                ),
-              ),
-
-            ],
-          ),
-        ),
-
-
-
-
-
-  SizedBox(height: 30,),
          Container(
             
             decoration: BoxDecoration(

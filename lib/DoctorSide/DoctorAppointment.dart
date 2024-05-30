@@ -5,19 +5,6 @@ import 'package:mcqs/constants.dart';
 
 
 class DoctorAppointment extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Doctor Roster',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: DoctorRosterScreen(),
-    );
-  }
-}
-
-class DoctorRosterScreen extends StatelessWidget {
   final int doctorId = doctor_id_d; // Example doctor ID
 
   @override

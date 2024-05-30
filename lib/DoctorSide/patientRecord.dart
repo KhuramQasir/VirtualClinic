@@ -2,48 +2,41 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mcqs/DoctorSide/DoctorPrescrition.dart';
-import 'package:mcqs/DoctorSide/DoctorSession.dart';
-import 'package:mcqs/DoctorSide/patientDetail.dart';
+import 'package:mcqs/DoctorSide/buttonsScreen.dart';
 import 'package:mcqs/DoctorSide/patientQuestionResponse.dart';
+import 'package:mcqs/Super%20Doctor/DoctorRating.dart';
+import 'package:mcqs/Super%20Doctor/buttonsScreen.dart';
+import 'package:mcqs/Super%20Doctor/questionResponsePage.dart';
 import 'package:mcqs/constants.dart';
 
 class PatientRcord extends StatefulWidget {
-  int pid;
-  PatientRcord({required this.pid});
+  const PatientRcord({Key? key}) : super(key: key);
+
+
+
+
   @override
   _PatientRcordState createState() => _PatientRcordState();
 }
 
 class _PatientRcordState extends State<PatientRcord> {
-  Future<Map<String, dynamic>>? _reportFuture;
+  late Future<List<Prescription>> futurePrescriptions;
 
   @override
   void initState() {
     super.initState();
-    _reportFuture = fetchPatientReport(widget.pid); // Ensure `pid` is defined and contains the patient ID
+    futurePrescriptions = fetchPrescriptions(patient_id_for_doctor);
   }
 
-  Future<Map<String, dynamic>> fetchPatientReport(int id) async {
-    final String url = '$apiUrl/get_patientReport_for_doctor/$id'; // Corrected API endpoint
+  Future<List<Prescription>> fetchPrescriptions(int patientId) async {
+    final response = await http.get(Uri.parse('$apiUrl/getpatientprescriptionlist/$patientId'));
 
-    try {
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data is List && data.isNotEmpty) {
-          return data[0];
-        } else {
-          print('Invalid data format');
-          return {};
-        }
-      } else {
-        print('Failed to load patient report: ${response.statusCode}');
-        return {};
-      }
-    } catch (e) {
-      print('Error: $e');
-      return {};
+    if (response.statusCode == 200) {
+      final List<dynamic> responseData = jsonDecode(response.body);
+      final List<dynamic> prescriptionsData = responseData[0]['data'];
+      return prescriptionsData.map((prescription) => Prescription.fromJson(prescription)).toList();
+    } else {
+      throw Exception('Failed to load prescriptions');
     }
   }
 
@@ -51,46 +44,16 @@ class _PatientRcordState extends State<PatientRcord> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Report"),
-        centerTitle: true,
+        title: Text('Prescription List'),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height, // Set height to fill entire screen
-          padding: EdgeInsets.symmetric(horizontal: 22),
-          color: Color(0xFF9AE4C9), // Set background color to "#9ae4c9"
-          child: FutureBuilder<Map<String, dynamic>>(
-            future: _reportFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('No report found'));
-              } else {
-                final report = snapshot.data!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 40,),
-                    Text(
-                      'Record',
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                     SizedBox(height: 40,),
-                    Container(
-                      margin: EdgeInsets.only(top: 8), // Adjust top margin as needed
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF5FD4AA), // Set background color to "#5fd4aa"
-                        border: Border.all(color: Colors.black),
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                      child: _buildReportContainer(context, report),
-                    ),
-                     SizedBox(height: 40,),
-                    ElevatedButton(
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+              
+                     ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -102,18 +65,16 @@ class _PatientRcordState extends State<PatientRcord> {
                       onPressed: () {
                        Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => patientQuestionResponse(patient_id: patient_id_for_doctor, phid: patient_id_for_doctor,)),
+                    MaterialPageRoute(builder: (context) => QuestionResponsePage(patientId: patient_id_for_doctor,)),
                   );
-                },
-                     
-                      child: Text(
+                },child: Text(
                         "Questionnaire Record",
                         style: TextStyle(
                           color: Colors.white, // Set text color to white
                         ),
                       ),
                     ),
-                    ElevatedButton(
+                     ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -138,48 +99,78 @@ class _PatientRcordState extends State<PatientRcord> {
                     ),
 
 
-                  ],
-                );
-              }
-            },
+                 
+              ],
+            ),
           ),
-        ),
+          Expanded(
+            child: FutureBuilder<List<Prescription>>(
+              future: futurePrescriptions,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: No Data For This'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No prescriptions found'));
+                } else {
+                  final prescriptions = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: prescriptions.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        color: Colors.green,
+                        child: ListTile(
+                          title: Text(
+                            prescriptions[index].name,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Date: ${prescriptions[index].date}\nPrescriptions: ${prescriptions[index].prescriptions}',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          trailing: IconButton(onPressed: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context){
+                              return twoButtonsScreenDoctor(date: prescriptions[index].date,);
+                            }));
+                          }, icon: Icon(Icons.view_agenda,color: Colors.white)),
+                        ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildReportContainer(BuildContext context, Map<String, dynamic> report) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildTextField("Disease:", report['disease']),
-        SizedBox(height: 24),
-        Divider(),
-        SizedBox(height: 24),
-        _buildTextField("Patient Name:", report['patient_name']),
-        SizedBox(height: 23),
-        _buildTextField("Gender:", report['gender']),
-        SizedBox(height: 23),
-        _buildTextField("Session Diagnostics:", report['session_diagnostics'] ?? 'N/A'),
-        SizedBox(height: 23),
-        _buildTextField("Video Call Diagnostics:", report['video_call_diagnostics'] ?? 'N/A'),
-        SizedBox(height: 23),
-        _buildTextField("Session Patient History ID:", report['session_patient_history_id'].toString()),
-        SizedBox(height: 23),
-        _buildTextField("Video Call Patient History ID:", report['video_call_patient_history_id']?.toString() ?? 'N/A'),
-        SizedBox(height: 20),
-      ],
-    );
-  }
+class Prescription {
+  final String date;
+  final String name;
+  final int patientId;
+  final String prescriptions;
 
-  Widget _buildTextField(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: TextStyle(fontSize: 16)),
-        SizedBox(width: 20),
-        Text(value, style: TextStyle(fontSize: 16)),
-      ],
+  Prescription({
+    required this.date,
+    required this.name,
+    required this.patientId,
+    required this.prescriptions,
+  });
+
+  factory Prescription.fromJson(Map<String, dynamic> json) {
+    return Prescription(
+      date: json['date'],
+      name: json['name'],
+      patientId: json['patient_id'],
+      prescriptions: json['prescriptions'],
     );
   }
 }

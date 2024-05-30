@@ -122,7 +122,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
                         if (currentAppointments.isNotEmpty) {
                           Navigator.push(context, MaterialPageRoute(builder: (context) {
                             final appointment = currentAppointments.first;
-                            return PatientRcord(pid: appointment['Patient_id']);
+                            return PatientRcord();
                           }));
                           // showDialog(
                           //   context: context,

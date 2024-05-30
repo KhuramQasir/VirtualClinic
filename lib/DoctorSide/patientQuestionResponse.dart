@@ -6,7 +6,7 @@ import 'package:mcqs/constants.dart';
 class patientQuestionResponse extends StatefulWidget {
   final int phid;
 
-  patientQuestionResponse({required this.phid, required int patient_id});
+  patientQuestionResponse({required this.phid});
 
   @override
   _patientQuestionResponseState createState() => _patientQuestionResponseState();
@@ -38,7 +38,7 @@ class _patientQuestionResponseState extends State<patientQuestionResponse> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Patient Session Responses'),
+        title: Text('Patient Question Responses'),
       ),
       body: FutureBuilder<List<dynamic>>(
         future: _patientSessionResponses,

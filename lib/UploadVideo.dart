@@ -150,7 +150,7 @@ class _UploadState extends State<Upload> {
                         if (questions[index].videoFile != null) {
                           postData(
                             context: context,
-                            PatientHistoryId: 1,
+                            PatientHistoryId: phid,
                             Question: questions[index].Q,
                             Videofile: File(questions[index].videoFile!.path),
                           );
