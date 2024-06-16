@@ -19,31 +19,15 @@ import 'package:mcqs/UploadVideo.dart';
 import 'package:mcqs/VideoCall.dart';
 import 'package:mcqs/constants.dart';
 
-class Doctordashboard extends StatelessWidget {
+
+class Doctordashboard extends StatefulWidget {
   const Doctordashboard({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      showSemanticsDebugger: false,
-      home: Scaffold(
-        
-        body: ConsultationScreen(),
-      ),
-      routes: {
-        '/session': (context) => Session(),
-        // Define route for Session Screen
-      },
-    );
-  }
+  _DoctordashboardState createState() => _DoctordashboardState();
 }
 
-class ConsultationScreen extends StatefulWidget {
-  @override
-  _ConsultationScreenState createState() => _ConsultationScreenState();
-}
-
-class _ConsultationScreenState extends State<ConsultationScreen> {
+class _DoctordashboardState extends State<Doctordashboard> {
   @override
   void initState() {
     super.initState();
@@ -97,7 +81,8 @@ class _ConsultationScreenState extends State<ConsultationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Scaffold(
+      body: SingleChildScrollView(
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -435,6 +420,8 @@ SizedBox(height: 30,),
           ],
         ),
       ),
+    ),
     );
+    
   }
 }

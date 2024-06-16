@@ -7,6 +7,58 @@ import 'package:intl/intl.dart';
 import 'package:mcqs/McqsWithResponse.dart';
 import 'package:mcqs/PatientHome.dart';
 import 'package:mcqs/constants.dart';
+import 'package:mcqs/patienthomeNavigation.dart';
+
+
+
+
+
+
+// class ApiService {
+
+//   // Function to complete the questionnaire
+//   static Future<Map<String, dynamic>> completeQuestionnaire(String patientId) async {
+//     final url = Uri.parse('$apiUrl/complete_questionnaire');
+
+//     try {
+//       final response = await http.post(
+//         url,
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: jsonEncode({
+//           'patient_id': patientId,
+//         }),
+//       );
+
+//       if (response.statusCode == 200) {
+//         return jsonDecode(response.body);
+//       } else {
+//         // Handle non-200 responses
+//         return {
+//           'error': 'Error ${response.statusCode}: ${response.body}'
+//         };
+//       }
+//     } catch (e) {
+//       // Handle any errors that occur during the request
+//       return {
+//         'error': 'Failed to connect to the server: $e'
+//       };
+//     }
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
 
 class GetStart extends StatelessWidget {
   const GetStart({Key? key}) : super(key: key);
@@ -18,6 +70,7 @@ class GetStart extends StatelessWidget {
     // double ffem = MediaQuery.of(context).size.width / 400;
     double fem = 1; // You should define your fem value appropriately
     double ffem = 1; // You should define your ffem value appropriately
+      String _resultMessage = '';
 
 
  Future<int> getPatientDoctor(String id) async {
@@ -36,6 +89,9 @@ class GetStart extends StatelessWidget {
       throw Exception('Failed to load patient-doctor data');
     }
   }
+
+
+   
   
 Future<String> checkDoctor(String patientId) async {
   final url = Uri.parse('$apiUrl/check_doctor');
@@ -127,6 +183,20 @@ void _showDialog(BuildContext context, String message) {
     },
   );
 }
+// void _completeQuestionnaire() async {
+    
+//     // Call the API service
+//     var result = await ApiService.completeQuestionnaire(patientid.toString());
+
+//       if (result.containsKey('message')) {
+//         _resultMessage = result['message'];
+//       } else if (result.containsKey('error')) {
+//         _resultMessage = result['error'];
+//       } else {
+//         _resultMessage = 'Unknown error occurred';
+//       }
+
+//   }
 
 
 
@@ -215,7 +285,12 @@ Future<void> completeQuestionnaire(BuildContext context, String patientId) async
              print('Doctor Assign');
                 print(msg);
             if(msg=="No"){
-                 completeQuestionnaire(context, pid.toString()); // Replace '9' with the actual patient ID you want to test with
+            //  var result = await ApiService.completeQuestionnaire(patientid.toString());
+                completeQuestionnaire(context, pid.toString()); // Replace '9' with the actual patient ID you want to test with
+              
+
+                  
+
             }
 
             int doctorid=await getPatientDoctor(patientId.toString());
@@ -223,13 +298,17 @@ Future<void> completeQuestionnaire(BuildContext context, String patientId) async
                String visitDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
              int patienthistoryid=await storePatientHistory(doctorid.toString(), pid.toString(), 'active', 0, 'Session', visitDate.toString());
-             print('Patient History Id');
+             int patienthistoryidforvideo=await storePatientHistory(doctorid.toString(), pid.toString(), 'active', 0, 'videoCall', visitDate.toString());
+          
+             print('Patient History Id for Session');
              print(patienthistoryid);
               phid=patienthistoryid; 
-             
-              Navigator.push(context, MaterialPageRoute(builder: (context){
-                            return PatientHome();
-                          }));
+             print('Patient History Id for Video');
+             print(patienthistoryidforvideo);
+              Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => PatientHomeNavigation()),
+                      (Route<dynamic> route) => false
+                    );
             print('Disease found for Patient ID: $patientId');
 
           } else {

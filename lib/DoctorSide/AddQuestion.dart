@@ -18,8 +18,10 @@ class _AddQuestionState extends State<AddQuestion> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return 
+    SafeArea(
       child: Scaffold(
+  appBar: AppBar(title:Text("Add Questions") ,),
         backgroundColor: Colors.grey[50],
         body: SingleChildScrollView(
           child: Column(
@@ -104,7 +106,7 @@ class _AddQuestionState extends State<AddQuestion> {
                   border: Border.all()
                 ),
                 width: 350,
-                height: 400,
+                height: 300,
                 child: ListView.builder(
       itemCount: AddQuestion.length,
       itemBuilder: (context, index) {

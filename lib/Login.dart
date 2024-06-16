@@ -63,16 +63,16 @@ class _LoginState extends State<Login> {
         userId=await responseBody[0]['user_id'];
        patientid=userId;
 
-         Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => GetStart() ),
-    );
+        Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => GetStart()),
+                      (Route<dynamic> route) => false
+                    );
       } else if (message == "Doctor login") {
        did=userId;
-         Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => DoctorHomeNavigation()),
-    );
+        Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => DoctorHomeNavigation()),
+                      (Route<dynamic> route) => false
+                    );
       } else if (message == "Admin login") {
        
          Navigator.pushReplacement(
@@ -86,10 +86,10 @@ class _LoginState extends State<Login> {
          doctor_id_d=id;
        
          print(doctor_id_d);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => DoctorHomeNavigation()),
-        );
+        Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => DoctorHomeNavigation()),
+                      (Route<dynamic> route) => false
+                    );
       }
       else if (message == "senior_doctor login") {
       int id=await responseBody[0]['doctor_id'];

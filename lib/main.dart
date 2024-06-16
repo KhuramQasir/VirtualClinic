@@ -19,7 +19,7 @@ import 'package:mcqs/DoctorSide/DoctorVideoCall.dart';
 import 'package:mcqs/DoctorSide/Doctordashboard.dart';
 import 'package:mcqs/DoctorSide/SelectQuestion.dart';
 import 'package:mcqs/DoctorSide/doctorAllPatient.dart';
-import 'package:mcqs/DoctorSide/v.dart';
+
 import 'package:mcqs/GetStart.dart';
 import 'package:mcqs/Home.dart';
 import 'package:mcqs/Lock.dart';
@@ -36,6 +36,8 @@ import 'package:mcqs/Splash.dart';
 import 'package:mcqs/Super%20Doctor/SuperDoctorDashboard.dart';
 import 'package:mcqs/UploadVideo.dart';
 import 'package:mcqs/VideoCall.dart';
+import 'package:mcqs/VideoSessionlast.dart';
+import 'package:mcqs/patienthomeNavigation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -49,7 +51,7 @@ void main() async {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home:   Splash(),
+    home:  Splash(),
   ));
 }
- 
+

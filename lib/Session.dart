@@ -3,20 +3,24 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mcqs/VideoSessionlast.dart';
 import 'package:path/path.dart' as path; // Add this import
-import 'package:mcqs/Camera.dart';
 import 'package:mcqs/Home.dart';
 import 'constants.dart';
 
 class Session extends StatefulWidget {
   @override
-  _WelcomeScreenState createState() => _WelcomeScreenState();
+  _SessionState createState() => _SessionState();
 }
 
-class _WelcomeScreenState extends State<Session> {
+class _SessionState extends State<Session> {
   late Future<List<QuestionData>> questionData;
   String? selectedOption;
   int currentIndex = 0;
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+  String? _capturedImagePath;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -65,17 +69,11 @@ class _WelcomeScreenState extends State<Session> {
 
     if (response.statusCode == 200) {
       final List<dynamic> questionData = json.decode(response.body)[0];
-      print(json.decode(response.body)[0]);
       return questionData.map((e) => QuestionData.fromJson(e)).toList();
     } else {
       throw Exception('Failed to load question');
     }
   }
-
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-  String? _capturedImagePath;
-  bool isLoading = true;
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
@@ -89,7 +87,7 @@ class _WelcomeScreenState extends State<Session> {
     await _initializeControllerFuture;
 
     try {
-      Future.delayed(Duration(seconds: 3));
+      await Future.delayed(Duration(seconds: 3));
       final image = await _controller.takePicture();
       _capturedImagePath = image.path;
     } catch (e) {
@@ -104,8 +102,26 @@ class _WelcomeScreenState extends State<Session> {
     );
   }
 
-  void main() {
-    print(apiUrl);
+  void _showCompletionDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Completed'),
+        content: Text('You have reached the end of the questions.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop(); // Close the dialog
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => VideoSessionLast()),
+              );
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -121,7 +137,11 @@ class _WelcomeScreenState extends State<Session> {
         body: FutureBuilder<List<QuestionData>>(
           future: questionData,
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("${snapshot.error}"));
+            } else if (snapshot.hasData) {
               return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
@@ -132,53 +152,37 @@ class _WelcomeScreenState extends State<Session> {
                   }
                 },
               );
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
+            } else {
+              return Center(child: Text("No data found"));
             }
-            // By default, show a loading spinner.
-            return CircularProgressIndicator();
           },
         ),
-        bottomNavigationBar: _buildBottomBar(context),
+        // bottomNavigationBar: _buildBottomBar(),
       ),
     );
   }
 
-  Widget _buildBottomBar(BuildContext context) {
+  Widget _buildBottomBar() {
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           IconButton(icon: Icon(Icons.home), onPressed: navigateToHome),
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // Handle Search Icon press
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              // Handle Notifications Icon press
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              // Handle Settings Icon press
-            },
-          ),
+          IconButton(icon: Icon(Icons.search), onPressed: () {}),
+          IconButton(icon: Icon(Icons.notifications), onPressed: () {}),
+          IconButton(icon: Icon(Icons.settings), onPressed: () {}),
           IconButton(
             icon: Icon(Icons.arrow_forward),
             onPressed: () async {
               final data = await questionData;
-              setState(() {
-                currentIndex++; // Move to next question
-                if (currentIndex >= data.length) {
-                  // Reset index if it goes beyond the number of questions
-                  currentIndex = 0;
-                }
-              });
+              if (currentIndex < data.length - 1) {
+                setState(() {
+                  currentIndex++; // Move to next question
+                  _initializeCamera();
+                });
+              } else {
+                _showCompletionDialog();
+              }
             },
           ),
         ],
@@ -188,72 +192,75 @@ class _WelcomeScreenState extends State<Session> {
 
   Widget buildQuestionContent(QuestionData data) {
     return SingleChildScrollView(
-      child: FutureBuilder(
-        future: questionData,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          } else if (snapshot.hasData) {
-            return Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 7),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    "Look at this picture",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  SizedBox(height: 10),
-                  Image.network(data.imageUrl),
-                  SizedBox(height: 27),
-                  Text(
-                    snapshot.data[currentIndex].questionText,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  ...List.generate(
-                    snapshot.data[currentIndex].options.length,
-                    (index) => RadioListTile<String>(
-                      title: Text(snapshot.data[currentIndex].options[index]),
-                      value: snapshot.data[currentIndex].options[index],
-                      groupValue: selectedOption,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedOption = value!;
-                        });
-                      },
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              "Look at this picture",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            SizedBox(height: 10),
+            Container(
+              width: 500,height: 300,
+              child: Image.network(data.imageUrl)),
+            SizedBox(height: 20),
+            Text(
+              data.questionText,
+              
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 10),
+            
+            ...data.options.asMap().entries.map((entry) {
+              int idx = entry.key;
+              String option = entry.value;
+              return RadioListTile<String>(
+                title: Text(option),
+                value: 'option_${idx + 1}',
+                groupValue: selectedOption,
+                onChanged: (value) {
+                  setState(() {
+                    selectedOption = value!;
+                  });
+                },
+              );
+            }).toList(),
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (selectedOption != null) {
+                    await postData(
+                      selectionDetailsId: data.id,
+                      selectionOption: selectedOption!,
+                      patientHistoryId: phid,
+                      patientResponseImage: File(_capturedImagePath!),
+                      stimuliImg: data.imageUrl,
+                    );
+                    if (currentIndex < (await questionData).length - 1) {
                       setState(() {
-                        // Move to next question
-                        if (currentIndex < snapshot.data.length - 1) {
-                          currentIndex++;
-                        }
-                        _initializeCamera();
-                        postData(
-                          patientHistoryId: phid,
-                          patientResponseImage: File(_capturedImagePath!),
-                          selectionDetailsId: 4,
-                          selectionOption: selectedOption!,
-                          stimuliImg: data.imageUrl,
-                        );
+                        currentIndex++;
+                        selectedOption = null;
                       });
-                    },
-                    child: Text('Next'),
-                  ),
-                  Center(
-                    child: _capturedImagePath != null
-                        ? Image.file(File(_capturedImagePath!))
-                        : Container(),
-                  ),
-                ],
+                      _initializeCamera();
+                    } else {
+                      _showCompletionDialog();
+                    }
+                  }
+                },
+                child: Text('Next'),
               ),
-            );
-          } else {
-            return Container();
-          }
-        },
+            ),
+            // Center(
+            //   child: _capturedImagePath != null
+            //       ? Image.file(File(_capturedImagePath!))
+            //       : Container(),
+            // ),
+          ],
+        ),
       ),
     );
   }

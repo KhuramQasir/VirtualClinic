@@ -61,6 +61,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(title:Text("Select Questions") ,),
         body: SingleChildScrollView(
           child: SizedBox(
             width: double.infinity,
@@ -87,7 +88,7 @@ class _SelectQuestionState extends State<SelectQuestion> {
                     border: Border.all(),
                   ),
                   width: 350,
-                  height: 400,
+                  height: 300,
                   child: ListView.builder(
                     itemCount: widget.PQuestion.length,
                     itemBuilder: (context, index) {

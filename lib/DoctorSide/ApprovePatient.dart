@@ -1,11 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:mcqs/constants.dart';
-
-
+import 'package:mcqs/constants.dart'; // Replace with your actual constants file
 
 class ApprovePatient extends StatefulWidget {
   const ApprovePatient({Key? key}) : super(key: key);
@@ -21,7 +18,6 @@ class _ApprovePatientState extends State<ApprovePatient> {
   void initState() {
     super.initState();
     futureRequests = fetchRequests(doctor_id_d);  // Replace with actual doctor_id if needed
-   
   }
 
   Future<List<Request>> fetchRequests(int doctorId) async {
@@ -39,124 +35,115 @@ class _ApprovePatientState extends State<ApprovePatient> {
     }
   }
 
+  Future<void> assignDoctorToPatient(int patientId, int doctorId) async {
+    final url = Uri.parse('$apiUrl/doctor_assign_to_patient');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      'patient_id': patientId,
+      'doctor_id': doctorId,
+    });
 
+    try {
+      final response = await http.post(url, headers: headers, body: body);
 
-Future<void> assignDoctorToPatient(int patientId, int doctorId) async {
-  final url = Uri.parse('$apiUrl/doctor_assign_to_patient');
-  final headers = {'Content-Type': 'application/json'};
-  final body = jsonEncode({
-    'patient_id': patientId,
-    'doctor_id': doctorId,
-  });
-
-  try {
-    final response = await http.post(url, headers: headers, body: body);
-
-    if (response.statusCode == 200) {
-      print('Doctor assigned to patient successfully');
-      final responseData = jsonDecode(response.body);
-      print(responseData);
-      showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Success'),
-          content: Text('Doctor assigned to patient successfully'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-
-    } else {
+      if (response.statusCode == 200) {
+        print('Doctor assigned to patient successfully');
+        final responseData = jsonDecode(response.body);
+        print(responseData);
         showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Success'),
-          content: Text('Failed to assign doctor to patient. Status code: ${response.statusCode}'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Success'),
+              content: Text('Doctor assigned to patient successfully'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
-      },
-    );
-    }
-  } catch (e) {
-    print('Error occurred: $e');
-  }
-}
-Future<Map<String, dynamic>> postPatientSchedule(List<Map<String, String>> schedules) async {
-  final Uri url = Uri.parse('$apiUrl/PatientSchedule');
-  
-  try {
-    final http.Response response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(schedules),
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      if (jsonResponse.containsKey('message')) {
-        return jsonResponse;
       } else {
-        throw Exception('Unexpected response format');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text('Failed to assign doctor to patient. Status code: ${response.statusCode}'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
       }
-    } else {
-      throw Exception('Failed to post patient schedule: ${response.statusCode}');
+    } catch (e) {
+      print('Error occurred: $e');
     }
-  } catch (e) {
-    throw Exception('Failed to post patient schedule: $e');
   }
-}
 
+  Future<void> postPatientSchedule(List<Map<String, String>> schedules) async {
+    final Uri url = Uri.parse('$apiUrl/PatientSchedule');
 
+    for (var schedule in schedules) {
+      try {
+        final http.Response response = await http.post(
+          url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(schedule), // Send each schedule map
+        );
 
-List<Map<String, String>> getAppointmentJson(int pid) {
-  // Get the current time
-  DateTime now = DateTime.now();
-  // Format the current time as HH:mm:ss
-  String startTime = DateFormat('HH:mm:ss').format(now);
-
-  // Calculate end time (30 minutes later)
-  DateTime endTime = now.add(Duration(minutes: 30));
-  // Format the end time as HH:mm:ss
-  String endTimeFormatted = DateFormat('HH:mm:ss').format(endTime);
-
-  // Format today's date as yyyy-MM-dd
-  String date = DateFormat('yyyy-MM-dd').format(now);
-
-  // Create a list containing appointment details as a map
-  List<Map<String, String>> data = [
-    {
-      "starttime": startTime,
-      "endtime": endTimeFormatted,
-      "patient_id": pid.toString(), // You can change this as per your requirement
-      "date": date
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+          if (jsonResponse.containsKey('message')) {
+            print('Schedule added successfully: ${jsonResponse['message']}');
+          } else {
+            throw Exception('Unexpected response format');
+          }
+        } else {
+          throw Exception('Failed to post patient schedule: ${response.statusCode}');
+        }
+      } catch (e) {
+        throw Exception('Failed to post patient schedule: $e');
+      }
     }
-  ];
+  }
 
-  // Encode the list as JSON
-  String jsonData = jsonEncode(data);
-  print(jsonData);
-  return data;
-}
+  List<Map<String, String>> getAppointmentJson(int pid) {
+    // Get the current time
+    DateTime now = DateTime.now();
+    // Format the current time as HH:mm:ss
+    String startTime = DateFormat('HH:mm:ss').format(now);
 
+    // Calculate end time (30 minutes later)
+    DateTime endTime = now.add(Duration(minutes: 30));
+    // Format the end time as HH:mm:ss
+    String endTimeFormatted = DateFormat('HH:mm:ss').format(endTime);
 
+    // Format today's date as yyyy-MM-dd
+    String date = DateFormat('yyyy-MM-dd').format(now);
+
+    // Create a list containing appointment details as a map
+    return [
+      {
+        "starttime": startTime,
+        "endtime": endTimeFormatted,
+        "patient_id": pid.toString(),
+        "date": date
+      }
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -192,11 +179,11 @@ List<Map<String, String>> getAppointmentJson(int pid) {
                     children: [
                       IconButton(
                         icon: Icon(Icons.check, color: Colors.green),
-                        onPressed: () async{
-                           assignDoctorToPatient(request.id, doctor_id_d);
-                           var res=getAppointmentJson(int.parse(request.id.toString()));
-                            final Map<String, dynamic> response = await postPatientSchedule(res);
-                            print(response);
+                        onPressed: () async {
+                          await assignDoctorToPatient(request.id, doctor_id_d);
+                          var res = getAppointmentJson(int.parse(request.id.toString()));
+                          await postPatientSchedule(res); // Pass the list directly
+                          print('Appointment scheduled.');
                         },
                       ),
                       IconButton(
