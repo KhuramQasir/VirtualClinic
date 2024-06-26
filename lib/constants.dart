@@ -17,6 +17,7 @@ int did=0;
 //Doctor Side ids
 int doctor_id_d=0;
 int patient_id_for_doctor=0;
+int patientHistoryIdforDoctorSide=0;
 
 //senior doctor
 int senior_doctor_id=0;

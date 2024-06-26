@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mcqs/constants.dart'; // Assuming constants.dart contains your apiUrl
 import 'package:mcqs/Super%20Doctor/prescriptionListPage.dart';
-import 'package:mcqs/constants.dart';
-
-// Replace with your actual API URL
 
 class PatientsListPage extends StatefulWidget {
   final int doctorId;
@@ -22,20 +20,30 @@ class _PatientsListPageState extends State<PatientsListPage> {
   void initState() {
     super.initState();
     futurePatients = fetchPatients(widget.doctorId);
-    print('Doctor Id');
-    print(widget.doctorId);
-
   }
 
   Future<List<Patient>> fetchPatients(int doctorId) async {
-    final response = await http.get(Uri.parse('$apiUrl/get_require_ranking_patients/$doctorId'));
+    try {
+      final response = await http.get(
+        Uri.parse('$apiUrl/get_require_ranking_patients/$doctorId'),
+      );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> responseData = jsonDecode(response.body);
-      final List<dynamic> patientsData = responseData[0]['data']['patients'];
-      return patientsData.map((patient) => Patient.fromJson(patient)).toList();
-    } else {
-      throw Exception('Failed to load patients');
+      if (response.statusCode == 200) {
+        final dynamic responseData = jsonDecode(response.body);
+
+        if (responseData is List && responseData.length >= 2) {
+          final List<dynamic> patientsData = responseData[0]['data']['patients'];
+          var patients = patientsData.map((patientJson) => Patient.fromJson(patientJson)).toList();
+          return patients.cast<Patient>();
+        } else {
+          throw Exception('Invalid response format');
+        }
+      } else {
+        throw Exception('Failed to load patients: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching patients: $e');
+      return []; // Return empty list in case of error
     }
   }
 
@@ -62,17 +70,35 @@ class _PatientsListPageState extends State<PatientsListPage> {
                 return Card(
                   color: Colors.green,
                   child: ListTile(
-                    title: Text(patients[index].name,   style: TextStyle(
+                    title: Text(
+                      patients[index].name,
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
-                      ),),
-                    subtitle: Text('City: ${patients[index].city}',  style: TextStyle(color: Colors.white),),
-                    trailing: TextButton(onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context){
-                        return PrescriptionListPage(patientId: patients[index].id,did: widget.doctorId,);
-                      }));
-                    }, child: Text('Info',style: TextStyle(color: Colors.white),),)
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Disease: ${patients[index].disease}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    trailing: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PrescriptionListPage(
+                              patientId: patients[index].pid,
+                              did: widget.doctorId,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Info',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
                 );
               },
@@ -86,32 +112,26 @@ class _PatientsListPageState extends State<PatientsListPage> {
 
 class Patient {
   final String name;
-  final String city;
-  final String cnic;
-  final String dob;
-  final String gender;
+  final String disease;
   final int id;
-  final int userId;
+  final int pid;
+  final int doctorId;
 
   Patient({
+    required this.pid,
     required this.name,
-    required this.city,
-    required this.cnic,
-    required this.dob,
-    required this.gender,
+    required this.disease,
     required this.id,
-    required this.userId,
+    required this.doctorId,
   });
 
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
-      name: json['name'],
-      city: json['city'],
-      cnic: json['cnic'],
-      dob: json['dob'],
-      gender: json['gender'],
-      id: json['id'],
-      userId: json['user_id'],
+      pid: json['Patient_id'] ?? '',
+      name: json['name'] ?? '',
+      disease: json['disease'] ?? '',
+      id: json['Patient_id'] ?? 0,
+      doctorId: json['doctor_id'] ?? 0,
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mcqs/GetStart.dart';
 import 'package:mcqs/PatientHome.dart';
+import 'package:mcqs/patienthomeNavigation.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoSessionLast extends StatefulWidget {
@@ -14,43 +15,43 @@ class _VideoSessionLastState extends State<VideoSessionLast> {
   bool _isVideoCompleted = false;
 
   final List<String> videoPaths = [
-    'lib/Videos/Psychology_in_30_Seconds.mp4',
+    'lib/Videos/video3.mp4',
     'lib/Videos/Psychology_in_30_Seconds.mp4', // Replace with your second video file path
   ];
 
   final List<List<Question>> quizzes = [
     [
       Question(
-        questionText: 'What is Flutter?',
-        options: ['A bird', 'A framework', 'A car', 'A game'],
+        questionText: 'Based on the video presented, which emotion best resonates with your response?',
+        options: ['Sadness', 'Shock', 'Indifference', 'Sympathy'],
         correctOptionIndex: 1,
       ),
       Question(
-        questionText: 'Who developed Flutter?',
-        options: ['Apple', 'Microsoft', 'Google', 'Facebook'],
+        questionText: 'When viewing the joyful video, which sentiment aligns most with your response?',
+        options: ['Happiness', 'Elation', 'Indifference', 'Contentment'],
         correctOptionIndex: 2,
       ),
       Question(
-        questionText: 'Which language is used by Flutter?',
-        options: ['Java', 'Kotlin', 'Dart', 'Swift'],
+        questionText: 'Please select the option that aligns most with your emotional response?',
+        options: ['Disgusting', 'Unsettling', 'Indifferent', 'Neutral'],
         correctOptionIndex: 2,
       ),
     ],
     [
       Question(
-        questionText: 'What is Dart?',
-        options: ['A game', 'A programming language', 'A bird', 'A car'],
+        questionText: 'Based on the video presented, which emotion best resonates with your response?',
+        options: ['Sadness', 'Shock', 'Indifference', 'Sympathy'],
         correctOptionIndex: 1,
       ),
       Question(
-        questionText: 'Who developed Dart?',
-        options: ['Google', 'Microsoft', 'Facebook', 'Apple'],
-        correctOptionIndex: 0,
+        questionText: 'When viewing the joyful video, which sentiment aligns most with your response?',
+        options: ['Happiness', 'Elation', 'Indifference', 'Contentment'],
+        correctOptionIndex: 2,
       ),
       Question(
-        questionText: 'Which platform uses Dart?',
-        options: ['Flutter', 'React Native', 'Xamarin', 'Cordova'],
-        correctOptionIndex: 0,
+        questionText: 'Please select the option that aligns most with your emotional response?',
+        options: ['Disgusting', 'Unsettling', 'Indifferent', 'Neutral'],
+        correctOptionIndex: 2,
       ),
     ],
   ];
@@ -93,7 +94,7 @@ class _VideoSessionLastState extends State<VideoSessionLast> {
   void _navigateToDashboard() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => PatientDashboard()),
+      MaterialPageRoute(builder: (context) => PatientHomeNavigation()),
     );
   }
 

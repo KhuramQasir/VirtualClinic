@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:mcqs/Login.dart';
 import 'package:mcqs/McqsWithResponse.dart';
 import 'package:mcqs/PatientHome.dart';
 import 'package:mcqs/constants.dart';
@@ -329,12 +330,99 @@ Future<void> completeQuestionnaire(BuildContext context, String patientId) async
     print('Error occurred: $e');
   }
 }
+Future<Map<String, dynamic>> doctorLogout(String baseUrl, String id) async {
+  final url = '$baseUrl/logout/$id';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      // Parse the JSON response
+      final List<dynamic> responseBody = jsonDecode(response.body);
+
+      // Check if the structure matches the expected format
+      if (responseBody.length == 2 && responseBody[1] == 200) {
+        return {
+          'message': responseBody[0]['message'],
+          'status': responseBody[1]
+        };
+      } else {
+        return {
+          'error': 'Unexpected response format',
+          'status': response.statusCode
+        };
+      }
+    } else {
+      return {
+        'error': 'Failed to logout. Server returned status: ${response.statusCode}',
+        'status': response.statusCode
+      };
+    }
+  } catch (e) {
+    return {
+      'error': 'An error occurred: $e',
+      'status': 500
+    };
+  }
+}
+
+ void logoutpatient(String id) async {
+    var result = await doctorLogout('$apiUrl', id);
+
+    if (result.containsKey('message') && result['status'] == 200) {
+      print('Logout successful: ${result['message']}');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Success'),
+          content: Text(result['message']),
+          actions: [
+            TextButton(
+            onPressed: (){
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => Login()),
+                      (Route<dynamic> route) => false
+                    );
+                  },
+
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      print('Logout failed: ${result['error']}');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text(result['error']),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
 
 
     return Scaffold(
-      appBar: AppBar(  title: Center(child: Image.asset('lib/images/logo.jpg')),),
-      body: SingleChildScrollView(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            SizedBox(width: 100,),
+            Center(child: Image.asset('lib/images/logo.jpg')),
+            SizedBox(width: 36,),
+            IconButton(onPressed: (){
+               logoutpatient(patientid.toString());
+            }, icon: Icon(Icons.logout,color: Colors.green,))
+          ],
+        ),
+      ),  body: SingleChildScrollView(
   child: Center(
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -71,13 +71,13 @@ class _PatientReportState extends State<PatientReport> {
                   children: [
                     SizedBox(height: 92),
                     _buildReportContainer(context, report),
-                    SizedBox(height: 99),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Perform download action
-                      },
-                      child: Text("Download"),
-                    ),
+                    // SizedBox(height: 99),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     // Perform download action
+                    //   },
+                    //   child: Text("Download"),
+                    // ),
                   ],
                 );
               }
@@ -112,9 +112,12 @@ class _PatientReportState extends State<PatientReport> {
           SizedBox(height: 23),
           _buildTextField("Doctor Name:", report['DoctorName']),
           SizedBox(height: 23),
-          _buildTextField("Diagnostic:", report['Diagnostic']),
+          SingleChildScrollView (  scrollDirection: Axis.horizontal,
+            child: _buildTextField("Diagnostic:", report['Diagnostic'])),
           SizedBox(height: 23),
-          _buildTextField("Prescriptions:", report['Prescriptions']),
+           SingleChildScrollView (  scrollDirection: Axis.horizontal,
+            child:
+          _buildTextField("Prescriptions:", report['Prescriptions'])),
           SizedBox(height: 20),
         ],
       ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -13,25 +14,45 @@ class ApprovePatient extends StatefulWidget {
 
 class _ApprovePatientState extends State<ApprovePatient> {
   late Future<List<Request>> futureRequests;
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
     futureRequests = fetchRequests(doctor_id_d);  // Replace with actual doctor_id if needed
+
+    // Start periodic fetching every 10 seconds
+    timer = Timer.periodic(Duration(seconds: 10), (Timer t) {
+      if (mounted) { // Check if the widget is still mounted
+      
+        fetchRequests(doctor_id_d); // Refresh requests every 10 seconds
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
   }
 
   Future<List<Request>> fetchRequests(int doctorId) async {
-    final response = await http.post(
-      Uri.parse('$apiUrl/doctor_requests'),  
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'doctor_id': doctorId}),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$apiUrl/doctor_requests'),  
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'doctor_id': doctorId}),
+      );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body)['data'];
-      return data.map((json) => Request.fromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load requests');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body)['data'];
+        return data.map((json) => Request.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load requests');
+      }
+    } catch (e) {
+      print('Error fetching requests: $e');
+      return []; // Return empty list in case of error
     }
   }
 
@@ -48,6 +69,7 @@ class _ApprovePatientState extends State<ApprovePatient> {
 
       if (response.statusCode == 200) {
         print('Doctor assigned to patient successfully');
+        // No need to clear and fetch again, as the periodic timer will handle updates
         final responseData = jsonDecode(response.body);
         print(responseData);
         showDialog(
@@ -157,45 +179,48 @@ class _ApprovePatientState extends State<ApprovePatient> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: No Requests'));
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No requests found'));
           } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final request = snapshot.data![index];
-                return ListTile(
-                  title: Text(request.name),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Disease: ${request.disease}'),
-                      Text('Date: ${request.date}'),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.check, color: Colors.green),
-                        onPressed: () async {
-                          await assignDoctorToPatient(request.id, doctor_id_d);
-                          var res = getAppointmentJson(int.parse(request.id.toString()));
-                          await postPatientSchedule(res); // Pass the list directly
-                          print('Appointment scheduled.');
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.close, color: Colors.red),
-                        onPressed: () {
-                          // Handle reject action
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
+            return RefreshIndicator(
+              onRefresh: () => fetchRequests(doctor_id_d),
+              child: ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  final request = snapshot.data![index];
+                  return ListTile(
+                    title: Text(request.name),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Disease: ${request.disease}'),
+                        Text('Date: ${request.date}'),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.check, color: Colors.green),
+                          onPressed: () async {
+                            await assignDoctorToPatient(request.id, doctor_id_d);
+                            var res = getAppointmentJson(int.parse(request.id.toString()));
+                            await postPatientSchedule(res); // Pass the list directly
+                            print('Appointment scheduled.');
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close, color: Colors.red),
+                          onPressed: () {
+                            // Handle reject action
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             );
           }
         },

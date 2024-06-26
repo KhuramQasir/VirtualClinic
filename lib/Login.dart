@@ -8,6 +8,7 @@ import 'package:mcqs/GetStart.dart';
 
 import 'package:mcqs/Home.dart';
 import 'package:mcqs/PatientHome.dart';
+import 'package:mcqs/SignUpScreens/SignUpHome.dart';
 import 'package:mcqs/Super%20Doctor/SuperDoctorDashboard.dart';
 import 'package:mcqs/Super%20Doctor/home.dart';
 import 'package:mcqs/constants.dart';
@@ -36,7 +37,7 @@ class _LoginState extends State<Login> {
     // Navigate to Signup screen
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Signup()),
+      MaterialPageRoute(builder: (context) => SignUpHome()),
     );
   }
 

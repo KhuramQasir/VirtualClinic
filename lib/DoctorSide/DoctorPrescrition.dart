@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mcqs/DoctorSide/Doctordashboard.dart';
+import 'package:intl/intl.dart';
 import 'dart:convert';
 
+// Replace with actual imports from your project
+import 'package:mcqs/DoctorSide/DoctorHomeNavigation.dart';
 import 'package:mcqs/constants.dart';
 
 class DoctorPrescription extends StatefulWidget {
@@ -19,6 +21,9 @@ class _DoctorPrescriptionState extends State<DoctorPrescription> {
   List<String> addedPrescriptions = [];
   int patientId = patient_id_for_doctor;
 
+  bool isChecked = false;
+  DateTime? selectedDateTime;
+
   @override
   void initState() {
     super.initState();
@@ -26,69 +31,105 @@ class _DoctorPrescriptionState extends State<DoctorPrescription> {
   }
 
   Future<void> fetchPrescriptions() async {
-  final response = await http.get(Uri.parse('$apiUrl/get_all_prescriptions'));
+    try {
+      final response =
+          await http.get(Uri.parse('$apiUrl/get_all_prescriptions'));
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    final List<String> prescriptions = List<String>.from(data[0]['prescriptions']);
-    setState(() {
-      dropdownItemList = prescriptions.toSet().toList(); // Remove duplicates
-    });
-  } else {
-    throw Exception('Failed to load prescriptions');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<String> prescriptions =
+            List<String>.from(data[0]['prescriptions']);
+        setState(() {
+          dropdownItemList = prescriptions.toSet().toList();
+        });
+      } else {
+        throw Exception('Failed to load prescriptions');
+      }
+    } catch (e) {
+      print('Error fetching prescriptions: $e');
+    }
   }
-}
 
+  List<Map<String, String>> getAppointmentJson(int pid, DateTime now) {
+    String startTime = DateFormat('HH:mm:ss').format(now);
+    DateTime endTime = now.add(Duration(minutes: 30));
+    String endTimeFormatted = DateFormat('HH:mm:ss').format(endTime);
+    String date = DateFormat('yyyy-MM-dd').format(now);
 
-Future<void> setPrescriptions() async {
-  final response = await http.post(
-    Uri.parse('$apiUrl/set_prescription/$patientId'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'prescriptions': addedPrescriptions}),
-  );
-
-  if (response.statusCode == 200) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Success'),
-          content: Text('Prescriptions set successfully'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                 Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Doctordashboard()),
-                  );
-              },
-            ),
-          ],
-        );
-      },
-    );
-  } else {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: Text('Failed to set prescriptions'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    return [
+      {
+        "starttime": startTime,
+        "endtime": endTimeFormatted,
+        "patient_id": pid.toString(),
+        "date": date
+      }
+    ];
   }
-}
 
+  Future<void> setPrescriptions() async {
+    try {
+      final response = await http.post(
+        Uri.parse('$apiUrl/set_prescription/$patientId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'prescriptions': addedPrescriptions}),
+      );
+
+      if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Success'),
+              content: Text('Prescriptions set successfully'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context){
+                          return DoctorHomeNavigation();
+                        }));
+                    },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        throw Exception('Failed to set prescriptions');
+      }
+    } catch (e) {
+      print('Error setting prescriptions: $e');
+    }
+  }
+
+  Future<void> _pickDateTime() async {
+    DateTime now = DateTime.now();
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDateTime ?? now,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null) {
+      TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? now),
+      );
+
+      if (pickedTime != null) {
+        setState(() {
+          selectedDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,22 +146,38 @@ Future<void> setPrescriptions() async {
               endIndent: 61,
             ),
             SizedBox(height: 26),
-            Padding(
-              padding: EdgeInsets.only(left: 126),
-              child: Text(
-                "Prescription",
-                style: TextStyle(fontSize: 20),
+            InkWell(
+              onTap: () {
+                _pickDateTime();
+              },
+              child: Padding(
+                padding: EdgeInsets.only(left: 126),
+                child: Text(
+                  "Prescription",
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ),
             SizedBox(height: 19),
             Center(child: _buildDropDown(context)),
             SizedBox(height: 26),
             Center(child: _buildAdd(context)),
+            if (selectedDateTime != null) ...[
+              SizedBox(height: 16),
+              Center(
+                child: Text(
+                  "Selected DateTime: ${selectedDateTime.toString()}",
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+              ),
+            ],
             SizedBox(height: 33),
             Center(
-                child: Container(
-                    height: 300,
-                    child: SingleChildScrollView(child: _buildView(context)))),
+              child: Container(
+                height: 300,
+                child: SingleChildScrollView(child: _buildView(context)),
+              ),
+            ),
             SizedBox(height: 54),
             Center(child: _buildSet(context)),
             SizedBox(height: 56),
@@ -165,25 +222,87 @@ Future<void> setPrescriptions() async {
   }
 
   Widget _buildAdd(BuildContext context) {
-    return SizedBox(
-      width: 100, // Increase the width as needed
-      child: ElevatedButton(
-        onPressed: () {
-          if (selectedPrescription != null) {
-            setState(() {
-              addedPrescriptions.add(selectedPrescription!);
-            });
-          }
-        },
-        child: Text("Add", style: TextStyle(color: Colors.white)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 63),
+          child: Row(
+            children: [
+              Checkbox(
+                value: isChecked,
+                onChanged: (bool? value) {
+                  setState(() {
+                    isChecked = value ?? false;
+                  });
+                },
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    _pickDateTime();
+                  },
+                  child: Text(
+                    "Schedule Next appointment",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ),
+        SizedBox(
+          width: 100,
+          child: ElevatedButton(
+            onPressed: () {
+              setState(() {
+                addedPrescriptions.add(selectedPrescription!);
+                isChecked = false;
+                selectedPrescription = null;
+              });
+            },
+            child: Text("Add", style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  Future<void> postPatientSchedule(List<Map<String, String>> schedules) async {
+    final Uri url = Uri.parse('$apiUrl/PatientSchedule');
+
+    for (var schedule in schedules) {
+      try {
+        final http.Response response = await http.post(
+          url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(schedule), // Send each schedule map
+        );
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+          if (jsonResponse.containsKey('message')) {
+            print('Schedule added successfully: ${jsonResponse['message']}');
+          } else {
+            throw Exception('Unexpected response format');
+          }
+        } else {
+          throw Exception('Failed to post patient schedule: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Failed to post patient schedule: $e');
+      }
+    }
   }
 
   Widget _buildView(BuildContext context) {
@@ -221,10 +340,17 @@ Future<void> setPrescriptions() async {
 
   Widget _buildSet(BuildContext context) {
     return SizedBox(
-      width: 100, // Increase the width as needed
+      width: 100,
       child: ElevatedButton(
-        onPressed: () {
-          setPrescriptions();
+        onPressed: () async {
+          if (isChecked) {
+            setPrescriptions();
+            var res = getAppointmentJson(patientId, selectedDateTime!);
+            print(res);
+            await postPatientSchedule(res); // Pass the list directly
+          } else {
+            setPrescriptions();
+          }
         },
         child: Text("Set", style: TextStyle(color: Colors.white)),
         style: ElevatedButton.styleFrom(

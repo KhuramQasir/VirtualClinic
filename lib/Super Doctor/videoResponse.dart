@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:mcqs/constants.dart';
 import 'package:video_player/video_player.dart';
+
 
 class ApiService {
   Future<List<dynamic>> getPatientVideoCallResponse(int patientHistoryId) async {
@@ -17,110 +18,105 @@ class ApiService {
   }
 }
 
-
 class SuperDoctorVideoResponse extends StatefulWidget {
-  String patientid,date;
-  SuperDoctorVideoResponse({required this.date,required this.patientid});
+  final String patientid;
+  final String date;
+
+  SuperDoctorVideoResponse({required this.date, required this.patientid});
 
   @override
   State<SuperDoctorVideoResponse> createState() => _SuperDoctorVideoResponseState();
 }
 
-
 class _SuperDoctorVideoResponseState extends State<SuperDoctorVideoResponse> {
- late int patientHistoryId;
- late Future<List<dynamic>> futureResponses;
-  Future<int?> getSessionIdOnDate(String patientId, String date, String type) async {
-  final url = Uri.parse('$apiUrl/getSessionidondate'); // Replace with your actual endpoint
-  final headers = {"Content-Type": "application/json"};
-  final body = jsonEncode({
-    "patient_id": int.parse(patientId),
-    "date": date,
-    "type": type,
-  });
+   int patientHistoryId=0;
+  Future<List<dynamic>>? futureResponses;
 
-  try {
-    final response = await http.post(url, headers: headers, body: body);
-    if (response.statusCode == 200) {
-      final responseBody = jsonDecode(response.body);
-      if (responseBody is List && responseBody.isNotEmpty) {
-        final patientHistoryId = responseBody[0]['patient_history_id'];
-        return patientHistoryId;
+  Future<int?> getSessionIdOnDate(String patientId, String date, String type) async {
+    final url = Uri.parse('$apiUrl/getSessionidondate');
+    final headers = {"Content-Type": "application/json"};
+    final body = jsonEncode({
+      "patient_id": int.parse(patientId),
+      "date": date,
+      "type": type,
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        if (responseBody is List && responseBody.isNotEmpty) {
+          return responseBody[0]['patient_history_id'];
+        } else {
+          print('Unexpected response format: $responseBody');
+          return null;
+        }
       } else {
-        // Handle unexpected response format
-        print('Unexpected response format: $responseBody');
+        print('Failed to load data: ${response.statusCode}');
         return null;
       }
-    } else {
-      // Handle non-200 responses
-      print('Failed to load data: ${response.statusCode}');
+    } catch (e) {
+      print('Error: $e');
       return null;
     }
-  } catch (e) {
-    // Handle errors
-    print('Error: $e');
-    return null;
   }
-}
 
-void fetchPatientHistoryId() async {
-  final patientId = widget.patientid;
-  final date = widget.date;
-  final type = 'videoCall';
+  void fetchPatientHistoryId() async {
+    final patientId = widget.patientid;
+    final date = widget.date;
+    final type = 'videoCall';
 
-   patientHistoryId = (await getSessionIdOnDate(patientId, date, type))!;
-  if (patientHistoryId != null) {
-    print('Patient History ID: $patientHistoryId');
-    // You can now use patientHistoryId in your application
-  } else {
-    print('Failed to fetch Patient History ID');
+    int? historyId = await getSessionIdOnDate(patientId, date, type);
+
+    if (historyId != null) {
+      setState(() {
+        patientHistoryId = historyId;
+        futureResponses = ApiService().getPatientVideoCallResponse(patientHistoryId);
+      });
+    } else {
+      print('Failed to fetch Patient History ID');
+      // Handle the error as needed
+    }
   }
-}
 
- 
-
-@override
-void initState() {
-  super.initState();
-  fetchPatientHistoryId();
-  futureResponses = ApiService().getPatientVideoCallResponse(patientHistoryId);
-
-}
-
+  @override
+  void initState() {
+    super.initState();
+    fetchPatientHistoryId();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<dynamic>>(
-        future: futureResponses,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No data available'));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final response = snapshot.data![index];
-                return VideoResponseTile(
-                  diagnostic: response['diagnostic'],
-                  question: response['question'],
-                  videoUrl: response['response_video_url'],
-                );
+      body: futureResponses == null
+          ? Center(child: CircularProgressIndicator()) // Show a loading indicator while fetching patientHistoryId
+          : FutureBuilder<List<dynamic>>(
+              future: futureResponses,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No data available'));
+                } else {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final response = snapshot.data![index];
+                      return VideoResponseTile(
+                        diagnostic: response['diagnostic'],
+                        question: response['question'],
+                        videoUrl: response['response_video_url'],
+                      );
+                    },
+                  );
+                }
               },
-            );
-          }
-        },
-      ),
-
+            ),
     );
   }
 }
-
-
 
 class VideoResponseTile extends StatefulWidget {
   final String diagnostic;
@@ -160,9 +156,8 @@ class _VideoResponseTileState extends State<VideoResponseTile> {
       }
     } catch (error) {
       print('Error initializing video player: $error');
-      // Handle specific error cases if needed
     } finally {
-      if (!mounted) return; // Check if widget is still mounted
+      if (!mounted) return;
       setState(() {}); // Trigger a rebuild to update the UI
     }
   }
@@ -205,32 +200,31 @@ class _VideoResponseTileState extends State<VideoResponseTile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 100),
-                     Container(
-                          height: 30,
-                          width: 120,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10), // Adjust the value to change the curve radius
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black,
-                                blurRadius: 5,
-                                spreadRadius: 2,
-                                offset: Offset(0, 2), // Adjust the shadow position if needed
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Text(
-                              widget.diagnostic,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red, // Optionally set text color
-                              ),
+                      Container(
+                        height: 30,
+                        width: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black,
+                              blurRadius: 5,
+                              spreadRadius: 2,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            widget.diagnostic,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
                             ),
                           ),
-                        )
-                        ,
+                        ),
+                      ),
                       SizedBox(height: 70),
                       Text(widget.question),
                     ],

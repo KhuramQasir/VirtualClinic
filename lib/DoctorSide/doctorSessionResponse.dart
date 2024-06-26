@@ -75,6 +75,7 @@ class _DoctorSessionResponseState extends State<DoctorSessionResponse> {
 
      patientHistoryId = (await getSessionIdOnDate(patientId.toString(), date, type))!;
     if (patientHistoryId != null) {
+      patientHistoryIdforDoctorSide=patientHistoryId;
       print('Patient History ID: $patientHistoryId');
       setState(() {
         _patientSessionResponses = getPatientSessionResponses(patientHistoryId);

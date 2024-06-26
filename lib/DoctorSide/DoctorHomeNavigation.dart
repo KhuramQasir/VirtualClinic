@@ -118,9 +118,9 @@ Future<Map<String, dynamic>> doctorLogout(String baseUrl, String id) async {
       appBar: AppBar(
         title: Row(
           children: [
-            SizedBox(width: 90,),
+            SizedBox(width: 50,),
             Center(child: Image.asset('lib/images/logo.jpg')),
-            SizedBox(width: 46,),
+            SizedBox(width: 30,),
             IconButton(onPressed: (){
                logoutDoctor(doctor_id_d.toString());
             }, icon: Icon(Icons.logout,color: Colors.green,))

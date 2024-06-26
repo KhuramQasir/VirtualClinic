@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mcqs/GetStart.dart';
 import 'dart:convert';
-
 import 'package:mcqs/PatientHome.dart';
 import 'package:mcqs/constants.dart'; // For apiUrl
 
 class McqsWithResponse extends StatefulWidget {
   const McqsWithResponse({Key? key}) : super(key: key);
+
   @override
   _MCQsState createState() => _MCQsState();
 }
@@ -18,7 +18,9 @@ class _MCQsState extends State<McqsWithResponse> {
   int currentQuestionIndex = 0;
   String? selectedOption;
   List<Map<String, dynamic>> answers = [];
-   List<String> patientdiseaseoption = [];
+  List<String> patientdiseaseoption = [];
+  List<String> firstList = []; // To store selected options
+  List<String> secondList = []; // To store option identifiers
 
   @override
   void initState() {
@@ -26,78 +28,51 @@ class _MCQsState extends State<McqsWithResponse> {
     fetchQuestions();
   }
 
+  static callPatientDiseaseAPI(BuildContext context, int patientId, List<String> patientResponses) async {
+    try {
+      String url = '$apiUrl/patient_disease';
+      Map<String, dynamic> requestBody = {
+        'patient_id': patientId,
+        'patient_responses': patientResponses,
+      };
 
+      var response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestBody),
+      );
 
+      var responseBody = json.decode(response.body);
+      var message = responseBody['message'];
 
-static callPatientDiseaseAPI(BuildContext context, int patientId, List<String> patientResponses) async {
-  try {
-    // Your Flask API endpoint URL
-    String Url = '$apiUrl/patient_disease';
-
-    // Prepare the request body
-    Map<String, dynamic> requestBody = {
-      'patient_id': patientId,
-      'patient_responses': patientResponses,
-    };
-
-    // Make the POST request
-    var response = await http.post(
-      Uri.parse(Url),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(requestBody),
-    );
-
-    var responseBody = await json.decode(response.body);
-    var message = responseBody['message'];
-
-    // Check if request is successful
-    if (message != null) {
-      // Display a SnackBar with the message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(message ?? 'No message'),
         ),
       );
-    } else {
-      // If request failed, return error message
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
-      );
-     
-    }
-  } catch (e) {
-    // If an exception occurs, return error message
-     ScaffoldMessenger.of(context).showSnackBar(
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Exception occurred: $e'),
         ),
       );
+    }
   }
-}
-
 
   Future<void> sendData(List<Map<String, dynamic>> dataArray) async {
     try {
       final Uri res = Uri.parse('$apiUrl/PatientQuestionnaireResponse');
       final headers = {'Content-Type': 'application/json'};
-
-      // Send the POST request
-       // Convert dataArray to JSON
-    final jsonData = jsonEncode({'responses': dataArray});
+      final jsonData = jsonEncode({'responses': dataArray});
 
       final response = await http.post(res, headers: headers, body: jsonData);
 
-      // Check the response status
       if (response.statusCode == 200) {
-        // Request successful
         print('Data sent successfully');
         answers.clear();
       } else {
-        // Request failed
         print('Failed to send data: ${response.reasonPhrase}');
       }
     } catch (error) {
@@ -112,6 +87,7 @@ static callPatientDiseaseAPI(BuildContext context, int patientId, List<String> p
       setState(() {
         questions = questionData
             .map((q) => {
+                  'question_id': q['id'],
                   'question': q['question_text'],
                   'options': [
                     q['option_1'],
@@ -122,10 +98,9 @@ static callPatientDiseaseAPI(BuildContext context, int patientId, List<String> p
                 })
             .toList();
         isLoading = false;
-        selectedOption = questions[currentQuestionIndex]['options'][0]; // Set the first option as default
+        selectedOption = questions[currentQuestionIndex]['options'][0];
       });
     } else {
-      // Handle error
       print('Failed to load questions');
     }
   }
@@ -137,27 +112,39 @@ static callPatientDiseaseAPI(BuildContext context, int patientId, List<String> p
   }
 
   void handleNextButtonClick() {
+    if (selectedOption != null) {
+      firstList.add(selectedOption!); // Add selected option to firstList
+
+      // Find index of selected option
+      int selectedIndex = questions[currentQuestionIndex]['options'].indexOf(selectedOption!);
+
+      // Add identifier to secondList based on selectedIndex
+      if (selectedIndex >= 0) {
+        secondList.add('option_${selectedIndex + 1}');
+      }
+
+      print('First List: $firstList');
+      print('Second List: $secondList');
+    }
+
     setState(() {
-      
       answers.add({
         'patient_id': pid, // Replace with actual patient ID
-        'selected_option': selectedOption,
-        'questionnaire_id': 6, // Replace with actual questionnaire ID
-      }  );
-    if (selectedOption != null) {
-  patientdiseaseoption.add(selectedOption!); // Adding selectedOption to the list if it's not null
-}
+        'selected_option': secondList[currentQuestionIndex],
+        'questionnaire_id': questions[currentQuestionIndex]['question_id'], // Replace with actual questionnaire ID
+      });
 
+      if (selectedOption != null) {
+        patientdiseaseoption.add(selectedOption!);
+      }
 
-print(patientid);
       if (currentQuestionIndex < questions.length - 1) {
         currentQuestionIndex++;
         selectedOption = questions[currentQuestionIndex]['options'][0];
       } else {
-        callPatientDiseaseAPI(context,pid,patientdiseaseoption);
+        callPatientDiseaseAPI(context, pid, firstList);
         print(patientdiseaseoption);
         print(answers);
-        // Show completion dialog
         sendData(answers);
         showDialog(
           context: context,
@@ -167,7 +154,6 @@ print(patientid);
             actions: [
               TextButton(
                 onPressed: () {
-                  // Navigate to PatientHome
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
